@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainFragments.Transfer">
+
+  <LinearLayout
+      android:id="@+id/history_section"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="8"/>
+
+
+
+    <LinearLayout
+        android:id="@+id/bottom_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/button_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbutton"
+            android:text="Send" />
+
+        <Button
+            android:id="@+id/button_recieve"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbutton"
+            android:text="Recieve" />
+    </LinearLayout>
+
+
+</LinearLayout>
