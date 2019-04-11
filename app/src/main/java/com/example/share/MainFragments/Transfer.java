@@ -1,6 +1,7 @@
 package com.example.share.MainFragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.share.R;
-
+import com.example.share.ReceiveActivity;
+import com.example.share.SendActivity;
 
 
 public class Transfer extends Fragment {
@@ -40,9 +42,13 @@ public class Transfer extends Fragment {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.button_send:
+                    Intent sendIntent=new Intent(getContext(), SendActivity.class);
+                    startActivity(sendIntent);
                     Toast.makeText(getContext(), "Send pressed!!", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.button_recieve:
+                    Intent recIntent=new Intent(getContext(), ReceiveActivity.class);
+                    startActivity(recIntent);
                     Toast.makeText(getContext(), "Recieve Pressed!!", Toast.LENGTH_SHORT).show();
                     break;
             }
