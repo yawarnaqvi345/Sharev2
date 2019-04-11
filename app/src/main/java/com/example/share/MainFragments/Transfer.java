@@ -46,8 +46,6 @@ public class Transfer extends Fragment {
                     Toast.makeText(getContext(), "Recieve Pressed!!", Toast.LENGTH_SHORT).show();
                     break;
             }
-
-
         }
     };
 }
