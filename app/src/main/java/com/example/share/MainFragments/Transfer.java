@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.example.share.SendActivity;
 
 
 public class Transfer extends Fragment {
+    final String TAG="TransferFragment";
     Button buttonSend;
     Button buttonRecieve;
     public Transfer() {
@@ -25,10 +27,12 @@ public class Transfer extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG,"Oncreate");
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG,"OncreateView");
        View rootView = inflater.inflate(R.layout.fragment_transfer, container, false);
         buttonSend=rootView.findViewById(R.id.button_send);
         buttonRecieve=rootView.findViewById(R.id.button_recieve);
@@ -40,6 +44,7 @@ public class Transfer extends Fragment {
     View.OnClickListener buttonSendListener=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.d(TAG,"buttonSendListener");
             switch (v.getId()){
                 case R.id.button_send:
                     Intent sendIntent=new Intent(getContext(), SendActivity.class);

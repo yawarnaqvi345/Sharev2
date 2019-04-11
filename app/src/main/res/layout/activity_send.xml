@@ -7,18 +7,53 @@
     android:orientation="vertical"
     tools:context=".SendActivity">
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SEND ACTIVITY"
-        />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/send_activity_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <android.support.design.widget.TabLayout
+                android:id="@+id/send_activity_tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                app:tabMode="fixed"
+                app:tabIndicatorColor="@color/colorPrimary">
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Apps" />
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Files" />
+
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Photos"
+                    />
+
+
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Videos"
+                    />
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Music"
+                    />
+
+            </android.support.design.widget.TabLayout>
+        </android.support.v4.view.ViewPager>
+
     </LinearLayout>
+
+
 
 </LinearLayout>
