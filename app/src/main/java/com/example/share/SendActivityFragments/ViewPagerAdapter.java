@@ -16,6 +16,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public ViewPagerAdapter(Context cntxt,FragmentManager fm) {
         super(fm);
         mContext=cntxt;
+        int a;
         apps=new Apps();
         files=new Files();
         photos=new Photos();
