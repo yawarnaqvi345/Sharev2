@@ -102,19 +102,23 @@ public class Photos extends Fragment {
 
         public View getView(final int position, View convertView,
                             ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rootView = inflater.inflate(R.layout.grid_photo_layout, null);
             ImageView picturesView;
+            picturesView=rootView.findViewById(R.id.photo_thumb);
             if (convertView == null) {
-                picturesView = new ImageView(context);
+               // picturesView = new ImageView(context);
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                picturesView
-                        .setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+               // picturesView
+                      //  .setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             } else {
-                picturesView = (ImageView) convertView;
+                //rootView = (View) convertView;
             }
             Glide.with(context).load(images.get(position))
                     .placeholder(R.drawable.ic_launcher_foreground).centerCrop()
                     .into(picturesView);
-            return picturesView;
+            return rootView;
         }
     }
 }

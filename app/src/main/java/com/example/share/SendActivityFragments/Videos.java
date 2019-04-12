@@ -41,17 +41,19 @@ public class Videos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_videos, container, false);
-        rootViewMain = rootView;
+       // rootViewMain = rootView;
         videoGridView = rootView.findViewById(R.id.videos_grid_view);
         videoGridView.setAdapter(new VideoAdapter(getActivity()));
         videoGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //do work here
-                Toast.makeText(
-                        getActivity().getApplicationContext(),
-                        "position " + position + " " + videos.get(position),
-                        Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                                    int position, long arg3) {
+                if (null != videos && !videos.isEmpty())
+                    Toast.makeText(
+                            getActivity().getApplicationContext(),
+                            "position " + position + " " + videos.get(position),
+                            Toast.LENGTH_SHORT).show();
             }
         });
         // Inflate the layout for this fragment
