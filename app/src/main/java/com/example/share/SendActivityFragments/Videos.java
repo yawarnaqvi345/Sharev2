@@ -11,10 +11,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.share.R;
@@ -42,6 +44,16 @@ public class Videos extends Fragment {
         rootViewMain = rootView;
         videoGridView = rootView.findViewById(R.id.videos_grid_view);
         videoGridView.setAdapter(new VideoAdapter(getActivity()));
+        videoGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //do work here
+                Toast.makeText(
+                        getActivity().getApplicationContext(),
+                        "position " + position + " " + videos.get(position),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
         // Inflate the layout for this fragment
         return rootView;
     }
@@ -87,8 +99,6 @@ public class Videos extends Fragment {
             picturesView = rootView.findViewById(R.id.vid_thumb);
             if (convertView == null) {
                 // picturesView = new ImageView(context);
-
-                //picturesView = new ImageView(context);
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 //  picturesView
                 //         .setLayoutParams(new GridView.LayoutParams(270, 270));

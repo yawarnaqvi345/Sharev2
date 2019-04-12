@@ -107,7 +107,7 @@ public class Photos extends Fragment {
                 picturesView = new ImageView(context);
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 picturesView
-                        .setLayoutParams(new GridView.LayoutParams(270, 270));
+                        .setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             } else {
                 picturesView = (ImageView) convertView;
             }
