@@ -39,8 +39,8 @@ public class Videos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_videos, container, false);
-        rootViewMain=rootView;
-        videoGridView=rootView.findViewById(R.id.videos_grid_view);
+        rootViewMain = rootView;
+        videoGridView = rootView.findViewById(R.id.videos_grid_view);
         videoGridView.setAdapter(new VideoAdapter(getActivity()));
         // Inflate the layout for this fragment
         return rootView;
@@ -81,30 +81,26 @@ public class Videos extends Fragment {
                             ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rootView = inflater.inflate(R.layout.grid_video_layout,null);
+            View rootView = inflater.inflate(R.layout.grid_video_layout, null);
 
             ImageView picturesView;
             picturesView = rootView.findViewById(R.id.vid_thumb);
             if (convertView == null) {
-               // picturesView = new ImageView(context);
+                // picturesView = new ImageView(context);
 
                 //picturesView = new ImageView(context);
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-              //  picturesView
-               //         .setLayoutParams(new GridView.LayoutParams(270, 270));
-
+                //  picturesView
+                //         .setLayoutParams(new GridView.LayoutParams(270, 270));
             } else {
                 rootView = (View) convertView;
             }
-
             Glide.with(context).load(videos.get(position))
                     .placeholder(R.drawable.ic_launcher_foreground).centerCrop()
                     .into(picturesView);
-
-           // return picturesView ;
+            // return picturesView ;
             return rootView;
         }
-
     }
 
     private ArrayList<String> getAllShownVideoPath(Context activity) {

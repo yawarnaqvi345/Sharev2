@@ -10,22 +10,23 @@ import android.view.View;
 import com.example.share.R;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
-    Fragment apps,files,photos,videos,music;
+    Fragment apps, files, photos, videos, music;
     private Context mContext;
     TabLayout.Tab tabLayout;
-    public ViewPagerAdapter(Context cntxt,FragmentManager fm) {
+
+    public ViewPagerAdapter(Context cntxt, FragmentManager fm) {
         super(fm);
-        mContext=cntxt;
-        apps=new Apps();
-        files=new Files();
-        photos=new Photos();
-        videos=new Videos();
-        music=new Music();
+        mContext = cntxt;
+        apps = new Apps();
+        files = new Files();
+        photos = new Photos();
+        videos = new Videos();
+        music = new Music();
     }
 
     @Override
     public Fragment getItem(int i) {
-        switch(i){
+        switch (i) {
             case 0:
                 return apps;
             case 1:
@@ -44,6 +45,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return 5;
     }
+
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position

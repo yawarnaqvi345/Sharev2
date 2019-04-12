@@ -9,15 +9,15 @@ import android.util.Log;
 import com.example.share.SendActivityFragments.ViewPagerAdapter;
 
 public class SendActivity extends AppCompatActivity {
-    final  String TAG="SendActivity";
+    final String TAG = "SendActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"OnCreate");
+        Log.d(TAG, "OnCreate");
         setContentView(R.layout.activity_send);
         ViewPager viewPager = (ViewPager) findViewById(R.id.send_activity_view_pager);
-       ViewPagerAdapter adapter = new ViewPagerAdapter(this, getSupportFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this, getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.send_activity_tab_layout);
         tabLayout.setupWithViewPager(viewPager);

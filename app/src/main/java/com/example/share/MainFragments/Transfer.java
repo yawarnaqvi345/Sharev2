@@ -18,41 +18,45 @@ import com.example.share.SendActivity;
 
 
 public class Transfer extends Fragment {
-    final String TAG="TransferFragment";
+    final String TAG = "TransferFragment";
     Button buttonSend;
     Button buttonRecieve;
+
     public Transfer() {
         // Required empty public constructor
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"Oncreate");
+        Log.d(TAG, "Oncreate");
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG,"OncreateView");
-       View rootView = inflater.inflate(R.layout.fragment_transfer, container, false);
-        buttonSend=rootView.findViewById(R.id.button_send);
-        buttonRecieve=rootView.findViewById(R.id.button_recieve);
+        Log.d(TAG, "OncreateView");
+        View rootView = inflater.inflate(R.layout.fragment_transfer, container, false);
+        buttonSend = rootView.findViewById(R.id.button_send);
+        buttonRecieve = rootView.findViewById(R.id.button_recieve);
         buttonRecieve.setOnClickListener(buttonSendListener);
         buttonSend.setOnClickListener(buttonSendListener);
         // Inflate the layout for this fragment
         return rootView;
     }
-    View.OnClickListener buttonSendListener=new View.OnClickListener() {
+
+    View.OnClickListener buttonSendListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG,"buttonSendListener");
-            switch (v.getId()){
+            Log.d(TAG, "buttonSendListener");
+            switch (v.getId()) {
                 case R.id.button_send:
-                    Intent sendIntent=new Intent(getContext(), SendActivity.class);
+                    Intent sendIntent = new Intent(getContext(), SendActivity.class);
                     startActivity(sendIntent);
                     Toast.makeText(getContext(), "Send pressed!!", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.button_recieve:
-                    Intent recIntent=new Intent(getContext(), ReceiveActivity.class);
+                    Intent recIntent = new Intent(getContext(), ReceiveActivity.class);
                     startActivity(recIntent);
                     Toast.makeText(getContext(), "Recieve Pressed!!", Toast.LENGTH_SHORT).show();
                     break;

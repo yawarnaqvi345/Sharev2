@@ -13,37 +13,38 @@ import com.example.share.MainFragments.TextStream;
 import com.example.share.MainFragments.Transfer;
 
 public class MainActivity extends AppCompatActivity {
-    final String TAG="MainActivity";
+    final String TAG = "MainActivity";
     BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG,"OnCreate");
+        Log.d(TAG, "OnCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bottomNavigationView=findViewById(R.id.bottom_nav_menu);
+        bottomNavigationView = findViewById(R.id.bottom_nav_menu);
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_section,new Transfer()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_section, new Transfer()).commit();
     }
-    BottomNavigationView.OnNavigationItemSelectedListener bottomNavListener=
+
+    BottomNavigationView.OnNavigationItemSelectedListener bottomNavListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                    Log.d(TAG,"NavigationMenuClicked");
-                    Fragment selectedFragment=null;
-                   switch (menuItem.getItemId()){
-                       case R.id.nav_transfers:
-                           selectedFragment=new Transfer();
-                           break;
-                       case R.id.nav_files_explorer:
-                           selectedFragment=new FileExplorer();
-                           break;
-                       case R.id.nav_text_stream:
-                           selectedFragment=new TextStream();
-                           break;
-                   }
-                   getSupportFragmentManager().beginTransaction().replace(R.id.fragment_section,selectedFragment).commit();
-                   return true;
+                    Log.d(TAG, "NavigationMenuClicked");
+                    Fragment selectedFragment = null;
+                    switch (menuItem.getItemId()) {
+                        case R.id.nav_transfers:
+                            selectedFragment = new Transfer();
+                            break;
+                        case R.id.nav_files_explorer:
+                            selectedFragment = new FileExplorer();
+                            break;
+                        case R.id.nav_text_stream:
+                            selectedFragment = new TextStream();
+                            break;
+                    }
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_section, selectedFragment).commit();
+                    return true;
                 }
             };
 }

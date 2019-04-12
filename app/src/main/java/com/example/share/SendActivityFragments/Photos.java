@@ -47,17 +47,13 @@ public class Photos extends Fragment {
                                     int position, long arg3) {
                 if (null != images && !images.isEmpty())
                     Toast.makeText(
-                           getActivity().getApplicationContext(),
+                            getActivity().getApplicationContext(),
                             "position " + position + " " + images.get(position),
                             Toast.LENGTH_SHORT).show();
-                ;
-
             }
         });
         return rootView;
     }
-
-
     private ArrayList<String> getAllShownImagesPath(Context activity) {
         Uri uri;
         Cursor cursor;
@@ -65,32 +61,24 @@ public class Photos extends Fragment {
         ArrayList<String> listOfAllImages = new ArrayList<String>();
         String absolutePathOfImage = null;
         uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
         String[] projection = {MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
-
         cursor = activity.getContentResolver().query(uri, projection, null,
                 null, null);
-
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         column_index_folder_name = cursor
                 .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
         while (cursor.moveToNext()) {
             absolutePathOfImage = cursor.getString(column_index_data);
-
             listOfAllImages.add(absolutePathOfImage);
         }
         return listOfAllImages;
     }
-
-
     private class ImageAdapter extends BaseAdapter {
-
         /**
          * The context.
          */
         private Activity context;
-
         /**
          * Instantiates a new image adapter.
          *
@@ -100,7 +88,6 @@ public class Photos extends Fragment {
             context = localContext;
             images = getAllShownImagesPath(context);
         }
-
         public int getCount() {
             return images.size();
         }
@@ -121,17 +108,13 @@ public class Photos extends Fragment {
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 picturesView
                         .setLayoutParams(new GridView.LayoutParams(270, 270));
-
             } else {
                 picturesView = (ImageView) convertView;
             }
-
             Glide.with(context).load(images.get(position))
                     .placeholder(R.drawable.ic_launcher_foreground).centerCrop()
                     .into(picturesView);
-
             return picturesView;
         }
-
     }
 }
