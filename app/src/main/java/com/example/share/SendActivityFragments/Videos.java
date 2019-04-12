@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -99,13 +100,15 @@ public class Videos extends Fragment {
 
             ImageView picturesView;
             picturesView = rootView.findViewById(R.id.vid_thumb);
+           // Button vidButton=rootView.findViewById(R.id.vid_layout_button);
+            //vidButton.setClickable(true);
             if (convertView == null) {
                 // picturesView = new ImageView(context);
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 //  picturesView
                 //         .setLayoutParams(new GridView.LayoutParams(270, 270));
             } else {
-                rootView = (View) convertView;
+              //  rootView = (View) convertView;
             }
             Glide.with(context).load(videos.get(position))
                     .placeholder(R.drawable.ic_launcher_foreground).centerCrop()
