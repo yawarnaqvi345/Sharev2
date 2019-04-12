@@ -6,9 +6,17 @@
     tools:context=".SendActivityFragments.Videos">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Videos" />
+
+    <GridView
+        android:layout_margin="10dp"
+        android:id="@+id/videos_grid_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:gravity="center">
+
+    </GridView>
 
 </FrameLayout>
