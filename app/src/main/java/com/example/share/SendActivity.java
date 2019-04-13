@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.share.SendActivityFragments.ViewPagerAdapter;
+import com.example.share.fragments.sendactivityfragments.ViewPagerAdapter;
 
 public class SendActivity extends AppCompatActivity {
     final String TAG = "SendActivity";

@@ -1,4 +1,4 @@
-package com.example.share.SendActivityFragments;
+package com.example.share.fragments.sendactivityfragments;
 
 
 import android.app.Activity;

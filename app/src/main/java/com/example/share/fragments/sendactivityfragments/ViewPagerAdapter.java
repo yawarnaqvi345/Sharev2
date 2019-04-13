@@ -1,11 +1,10 @@
-package com.example.share.SendActivityFragments;
+package com.example.share.fragments.sendactivityfragments;
 
 import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.view.View;
 
 import com.example.share.R;
 

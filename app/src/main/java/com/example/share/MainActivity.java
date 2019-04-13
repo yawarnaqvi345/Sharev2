@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.share.MainFragments.FileExplorer;
-import com.example.share.MainFragments.TextStream;
-import com.example.share.MainFragments.Transfer;
+import com.example.share.fragments.mainfragments.FileExplorer;
+import com.example.share.fragments.mainfragments.TextStream;
+import com.example.share.fragments.mainfragments.Transfer;
 
 public class MainActivity extends AppCompatActivity {
     final String TAG = "MainActivity";
