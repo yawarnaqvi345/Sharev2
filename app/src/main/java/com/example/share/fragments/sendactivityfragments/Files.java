@@ -11,12 +11,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.share.R;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,8 +43,8 @@ public class Files extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_files, container, false);
 
-        files=getFilesInDirectory("dummy");
-        RecyclerView fileRecycler=rootView.findViewById(R.id.files_recycler_view);
+        files = getFilesInDirectory("dummy");
+        RecyclerView fileRecycler = rootView.findViewById(R.id.files_recycler_view);
         fileRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         fileRecycler.setAdapter(new FileRecyclerViewAdapter(files));
 
@@ -45,7 +52,7 @@ public class Files extends Fragment {
         return rootView;
     }
 
-    File[] getFilesInDirectory(String pat){
+    File[] getFilesInDirectory(String pat) {
         String path = Environment.getExternalStorageDirectory().toString();
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
@@ -55,29 +62,38 @@ public class Files extends Fragment {
 //        {
 //            Log.d("Files", "FileName:" + files[i].getName());
 //        }
-        return  files;
+        return files;
     }
 
-    public class FileRecyclerViewAdapter extends RecyclerView.Adapter<MyFileViewHolder>{
+    public class FileRecyclerViewAdapter extends RecyclerView.Adapter<MyFileViewHolder> {
         File[] mFilesList;
 
         public FileRecyclerViewAdapter(File[] files) {
             mFilesList = files;
+          //  List<File> mList= Arrays.asList(files);
+           // Collections.sort(mList);
+
         }
 
         @NonNull
         @Override
         public MyFileViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
-            View recyclerFile= layoutInflater.inflate(R.layout.recycler_file_list, viewGroup, false);
+            View recyclerFile = layoutInflater.inflate(R.layout.recycler_file_list, viewGroup, false);
             // RecyclerView.ViewHolder viewHolder = new RecyclerView.ViewHolder(listItem);
-            MyFileViewHolder viewHolder=new MyFileViewHolder(recyclerFile);
+            MyFileViewHolder viewHolder = new MyFileViewHolder(recyclerFile);
             return viewHolder;
         }
 
         @Override
         public void onBindViewHolder(@NonNull MyFileViewHolder myFileViewHolder, int i) {
             myFileViewHolder.fileName.setText(mFilesList[i].getName());
+            Date lastModDate = new Date(mFilesList[i].lastModified());
+
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd-MM-yy");
+            String formattedDate= dateFormat.format(lastModDate);
+            myFileViewHolder.lastModified.setText(formattedDate );
+            if(!mFilesList[i].isDirectory()){myFileViewHolder.folderIcon.setVisibility(View.INVISIBLE);}
         }
 
         @Override
@@ -85,11 +101,17 @@ public class Files extends Fragment {
             return mFilesList.length;
         }
     }
-    public class MyFileViewHolder extends  RecyclerView.ViewHolder{
+
+    public class MyFileViewHolder extends RecyclerView.ViewHolder {
         TextView fileName;
+        TextView lastModified;
+        ImageView folderIcon;
+
         public MyFileViewHolder(@NonNull View itemView) {
             super(itemView);
-            fileName=itemView.findViewById(R.id.textview_file_name);
+            fileName = itemView.findViewById(R.id.textview_file_name);
+            lastModified = itemView.findViewById(R.id.textview_file_last_modified);
+            folderIcon = itemView.findViewById(R.id.file_folder_icon);
         }
     }
 
