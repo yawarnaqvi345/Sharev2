@@ -44,7 +44,7 @@ public class Music extends Fragment {
         // Inflate the layout for this fragment
         return rootView;
     }
-    
+
     List<Track> getAllMusicTracks(){
        // List<Track> mTracks= ArrayList<Track>();
         ArrayList<Track> mTracks = new ArrayList<Track>();
