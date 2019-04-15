@@ -16,6 +16,7 @@
             android:layout_height="50dp"
             android:layout_gravity="left"
             android:layout_marginRight="10dp"
+            android:tint="@color/foldercolor"
             android:src="@drawable/ic_folder_black_24dp"/>
     <TextView
         android:id="@+id/textview_file_name"
