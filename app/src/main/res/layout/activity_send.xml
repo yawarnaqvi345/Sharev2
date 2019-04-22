@@ -20,6 +20,7 @@
                 android:id="@+id/send_activity_tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:tabTextAppearance="@style/MineCustomTabText"
                 android:layout_gravity="top"
                 android:outlineSpotShadowColor="@color/buttonbackgrnd"
                 app:tabMode="fixed"
