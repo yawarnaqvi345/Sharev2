@@ -60,6 +60,7 @@
         android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
         android:padding="20dp"
+        android:background="@color/backgroundsimple"
         android:visibility="invisible">
 
         <ImageView
