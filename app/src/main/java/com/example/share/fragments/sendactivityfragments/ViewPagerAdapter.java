@@ -6,7 +6,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.example.share.FileToSendPath;
 import com.example.share.R;
+
+import java.util.List;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     Fragment apps, files, photos, videos, music;

@@ -4,21 +4,31 @@ package com.example.share.fragments.sendactivityfragments;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.view.ActionMode;
+import android.text.PrecomputedText;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.share.FileToSendPath;
 import com.example.share.R;
+import com.example.share.SendActivity;
 
 import java.util.ArrayList;
 
@@ -27,6 +37,7 @@ import java.util.ArrayList;
  */
 public class Photos extends Fragment {
     GridView photosGridView;
+   LinearLayout photoLinearLayout;
     private ArrayList<String> images;
 
     public Photos() {
@@ -39,12 +50,14 @@ public class Photos extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_photos, container, false);
         photosGridView = rootView.findViewById(R.id.photos_grid_view);
+        photoLinearLayout = rootView.findViewById(R.id.photo_linear_layout);
         photosGridView.setAdapter(new ImageAdapter(getActivity()));
         photosGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int position, long arg3) {
+              //  photoLinearLayout.setLayoutParams(Para);
                 if (null != images && !images.isEmpty())
                     Toast.makeText(
                             getActivity().getApplicationContext(),
@@ -105,6 +118,33 @@ public class Photos extends Fragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rootView = inflater.inflate(R.layout.grid_photo_layout, null);
+            CheckBox photoCheckBox=rootView.findViewById(R.id.photo_checkbox);
+            ImageView photoThumb=rootView.findViewById(R.id.photo_thumb);
+            photoThumb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(
+                            getActivity().getApplicationContext(),
+                            "position of thumb" + position + " " + images.get(position),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+            photoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    FileToSendPath path=new FileToSendPath();
+                    path.setPath(images.get(position));
+                    if(isChecked) {
+                        SendActivity.mPathsList.add(path);
+                        buttonView.setChecked(true);
+                    }
+                    else{
+                        SendActivity.mPathsList.remove(getRefference(path));
+                       // SendActivity.UpdateView();
+                    }
+                  SendActivity.UpdateView();
+                }
+            });
             ImageView picturesView;
             picturesView=rootView.findViewById(R.id.photo_thumb);
             if (convertView == null) {
@@ -121,4 +161,14 @@ public class Photos extends Fragment {
             return rootView;
         }
     }
+
+   private FileToSendPath getRefference(FileToSendPath mPath){
+        for(FileToSendPath path:SendActivity.mPathsList){
+            if(path.getPath().equals(mPath.getPath()))
+                return path;
+        }
+        return null;
+   }
+
+
 }
