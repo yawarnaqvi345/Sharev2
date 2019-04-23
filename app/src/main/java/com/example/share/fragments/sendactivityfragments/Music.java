@@ -13,10 +13,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.share.FileToSendPath;
 import com.example.share.R;
+import com.example.share.SendActivity;
 import com.example.share.models.Track;
 
 import java.util.ArrayList;
@@ -111,12 +115,28 @@ public class Music extends Fragment {
 
        @Override
        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
+          final int pos=i;
            final String text = mTracks.get(i).getTitle();
            final String size = mTracks.get(i).getSize();
            final String length = mTracks.get(i).getLength();
            myViewHolder.title.setText(text);
            myViewHolder.size.setText(size);
            myViewHolder.length.setText(length);
+           myViewHolder.musicCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+               @Override
+               public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                   FileToSendPath path=new FileToSendPath();
+                   path.setPath(mTracks.get(pos).getTitle());
+                   path.setType("Music");
+                   if(isChecked) {
+                       SendActivity.mPathsList.add(path);
+                   }
+                   else{
+                       SendActivity.mPathsList.remove(SendActivity.getRefference(path));
+                   }
+                   SendActivity.UpdateView();
+               }
+           });
        }
 
 
@@ -131,11 +151,13 @@ public class Music extends Fragment {
       public TextView title;
       public  TextView size;
       public TextView length;
+      public CheckBox musicCheckbox;
        public MyViewHolder(@NonNull View itemView) {
            super(itemView);
            title=itemView.findViewById(R.id.track_title);
            size=itemView.findViewById(R.id.track_size);
            length=itemView.findViewById(R.id.track_length);
+           musicCheckbox=itemView.findViewById(R.id.music_checkbox);
        }
    }
     private String setCorrectDuration(String songs_duration) {

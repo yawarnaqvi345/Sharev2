@@ -23,6 +23,13 @@
             android:shadowColor="@color/colorAccent"
             android:background="@drawable/ic_play_circle_outline_black_24dp"
             />
+        <CheckBox
+            android:id="@+id/video_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:paddingBottom="30dp"/>
 
     </RelativeLayout>
 

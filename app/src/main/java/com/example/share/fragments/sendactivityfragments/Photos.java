@@ -134,6 +134,7 @@ public class Photos extends Fragment {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     FileToSendPath path=new FileToSendPath();
                     path.setPath(images.get(position));
+                    path.setType("Photo");
                     if(isChecked) {
                         SendActivity.mPathsList.add(path);
                         buttonView.setChecked(true);

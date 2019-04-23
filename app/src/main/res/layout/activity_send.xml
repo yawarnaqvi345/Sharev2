@@ -65,6 +65,7 @@
         android:visibility="invisible">
 
         <ImageView
+            android:id="@+id/cross_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
@@ -75,13 +76,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textAlignment="center"
             android:text="Items selected" />
 
         <ImageView
+            android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:src="@drawable/ic_navigate_next_black_24dp" />
+            android:src="@drawable/ic_send_black_24dp" />
     </LinearLayout>
 
 

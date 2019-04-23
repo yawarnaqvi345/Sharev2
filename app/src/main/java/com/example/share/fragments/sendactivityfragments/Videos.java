@@ -13,12 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.share.FileToSendPath;
 import com.example.share.R;
+import com.example.share.SendActivity;
 
 import java.util.ArrayList;
 
@@ -43,18 +47,7 @@ public class Videos extends Fragment {
        // rootViewMain = rootView;
         videoGridView = rootView.findViewById(R.id.videos_grid_view);
         videoGridView.setAdapter(new VideoAdapter(getActivity()));
-        videoGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1,
-                                    int position, long arg3) {
-                if (null != videos && !videos.isEmpty())
-                    Toast.makeText(
-                            getActivity().getApplicationContext(),
-                            "position " + position + " " + videos.get(position),
-                            Toast.LENGTH_SHORT).show();
-            }
-        });
         // Inflate the layout for this fragment
         return rootView;
     }
@@ -95,6 +88,26 @@ public class Videos extends Fragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rootView = inflater.inflate(R.layout.grid_video_layout, null);
+
+            CheckBox videoCheckBox=rootView.findViewById(R.id.video_checkbox);
+            videoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    FileToSendPath path=new FileToSendPath();
+                    path.setPath(videos.get(position));
+                    path.setType("Video");
+                    if(isChecked) {
+                        SendActivity.mPathsList.add(path);
+                        buttonView.setChecked(true);
+                    }
+                    else{
+                        SendActivity.mPathsList.remove(SendActivity.getRefference(path));
+                        // SendActivity.UpdateView();
+                    }
+                    SendActivity.UpdateView();
+                }
+            });
+
 
             ImageView picturesView;
             picturesView = rootView.findViewById(R.id.vid_thumb);

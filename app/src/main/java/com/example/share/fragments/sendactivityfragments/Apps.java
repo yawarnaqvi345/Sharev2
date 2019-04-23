@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.share.FileToSendPath;
 import com.example.share.R;
+import com.example.share.SendActivity;
 import com.example.share.models.AppIication;
 
 import java.util.ArrayList;
@@ -102,6 +105,25 @@ GridView appsGridView;
             View rootView = inflater.inflate(R.layout.grid_apps_layout, null);
             ImageView appIcon=rootView.findViewById(R.id.imageview_app_icon);
             TextView appName =rootView.findViewById(R.id.textview_app_name);
+            CheckBox appCheckBox =rootView.findViewById(R.id.apps_checkbox);
+            appCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    FileToSendPath path=new FileToSendPath();
+                    path.setPath(appList.get(position).getAppname());
+                    path.setType("Application");
+                    if(isChecked) {
+                        SendActivity.mPathsList.add(path);
+                        buttonView.setChecked(true);
+                    }
+                    else{
+                        SendActivity.mPathsList.remove(SendActivity.getRefference(path));
+                        // SendActivity.UpdateView();
+                    }
+                    SendActivity.UpdateView();
+                }
+            });
+
             if (convertView == null) {
                 // picturesView = new ImageView(context);
                 appIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
