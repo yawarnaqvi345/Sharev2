@@ -1,6 +1,9 @@
 package com.example.share;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,9 +33,9 @@ public class SendActivity extends AppCompatActivity {
         Log.d(TAG, "OnCreate");
         setContentView(R.layout.activity_send);
         final ViewPager viewPager = (ViewPager) findViewById(R.id.send_activity_view_pager);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this, getSupportFragmentManager());
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(this, getSupportFragmentManager());
         viewPager.setAdapter(adapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.send_activity_tab_layout);
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.send_activity_tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         selectedDisplayLayout=(LinearLayout)findViewById(R.id.selected_display_layout);
         numOfFilesSelected=findViewById(R.id.num_of_files_selected);
@@ -43,15 +46,18 @@ public class SendActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mPathsList.clear();
                 UpdateView();
-                viewPager.onRestoreInstanceState(null);
-                CheckBox checkbox=findViewById(R.id.apps_checkbox);
-                checkbox.setChecked(false);
+                Fragment frag=adapter.getItem(viewPager.getCurrentItem());
+                final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.detach(frag);
+                ft.attach(frag);
+                ft.commit();
             }
         });
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent shareIntent = new Intent(getApplicationContext(), FinalShareActivity.class);
+                startActivity(shareIntent);
             }
         });
     }

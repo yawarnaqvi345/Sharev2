@@ -106,6 +106,7 @@ GridView appsGridView;
             ImageView appIcon=rootView.findViewById(R.id.imageview_app_icon);
             TextView appName =rootView.findViewById(R.id.textview_app_name);
             CheckBox appCheckBox =rootView.findViewById(R.id.apps_checkbox);
+            appCheckBox.setChecked(false);
             appCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

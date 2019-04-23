@@ -14,7 +14,8 @@ import java.util.List;
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     Fragment apps, files, photos, videos, music;
     private Context mContext;
-    TabLayout.Tab tabLayout;
+
+    //TabLayout.Tab tabLayout;
 
     public ViewPagerAdapter(Context cntxt, FragmentManager fm) {
         super(fm);

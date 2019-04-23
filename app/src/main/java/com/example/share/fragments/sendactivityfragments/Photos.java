@@ -52,19 +52,19 @@ public class Photos extends Fragment {
         photosGridView = rootView.findViewById(R.id.photos_grid_view);
         photoLinearLayout = rootView.findViewById(R.id.photo_linear_layout);
         photosGridView.setAdapter(new ImageAdapter(getActivity()));
-        photosGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1,
-                                    int position, long arg3) {
-              //  photoLinearLayout.setLayoutParams(Para);
-                if (null != images && !images.isEmpty())
-                    Toast.makeText(
-                            getActivity().getApplicationContext(),
-                            "position " + position + " " + images.get(position),
-                            Toast.LENGTH_SHORT).show();
-            }
-        });
+//        photosGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> arg0, View arg1,
+//                                    int position, long arg3) {
+//              //  photoLinearLayout.setLayoutParams(Para);
+//                if (null != images && !images.isEmpty())
+//                    Toast.makeText(
+//                            getActivity().getApplicationContext(),
+//                            "position " + position + " " + images.get(position),
+//                            Toast.LENGTH_SHORT).show();
+//            }
+//        });
         return rootView;
     }
     private ArrayList<String> getAllShownImagesPath(Context activity) {
@@ -141,7 +141,6 @@ public class Photos extends Fragment {
                     }
                     else{
                         SendActivity.mPathsList.remove(getRefference(path));
-                       // SendActivity.UpdateView();
                     }
                   SendActivity.UpdateView();
                 }
@@ -149,7 +148,6 @@ public class Photos extends Fragment {
             ImageView picturesView;
             picturesView=rootView.findViewById(R.id.photo_thumb);
             if (convertView == null) {
-               // picturesView = new ImageView(context);
                 picturesView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                // picturesView
                       //  .setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
