@@ -55,6 +55,13 @@ public class SendActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPathsList.clear();
+    }
+
     public static void UpdateView(){
         numOfFilesSelected.setText(String.valueOf(mPathsList.size()));
         if(mPathsList.size()<1){
