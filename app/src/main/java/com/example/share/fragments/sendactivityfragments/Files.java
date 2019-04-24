@@ -11,10 +11,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.share.FileToSendPath;
 import com.example.share.R;
+import com.example.share.SendActivity;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -31,6 +36,7 @@ import java.util.List;
  */
 public class Files extends Fragment {
     File[] files;
+    String path=Environment.getExternalStorageDirectory().toString();
 
 
     public Files() {
@@ -43,7 +49,7 @@ public class Files extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_files, container, false);
 
-        files = getFilesInDirectory("dummy");
+        files = getFilesInDirectory(path);
         RecyclerView fileRecycler = rootView.findViewById(R.id.files_recycler_view);
         fileRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         fileRecycler.setAdapter(new FileRecyclerViewAdapter(files));
@@ -53,7 +59,7 @@ public class Files extends Fragment {
     }
 
     File[] getFilesInDirectory(String pat) {
-        String path = Environment.getExternalStorageDirectory().toString();
+        String path = pat;
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();
@@ -86,14 +92,45 @@ public class Files extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MyFileViewHolder myFileViewHolder, int i) {
+        public void onBindViewHolder(@NonNull final MyFileViewHolder myFileViewHolder, final int i) {
             myFileViewHolder.fileName.setText(mFilesList[i].getName());
             Date lastModDate = new Date(mFilesList[i].lastModified());
 
             DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd-MM-yy");
             String formattedDate= dateFormat.format(lastModDate);
             myFileViewHolder.lastModified.setText(formattedDate );
-            if(!mFilesList[i].isDirectory()){myFileViewHolder.folderIcon.setVisibility(View.INVISIBLE);}
+            if(!mFilesList[i].isDirectory()){
+                myFileViewHolder.folderIcon.setVisibility(View.GONE);
+            myFileViewHolder.fileCheckbox.setVisibility(View.VISIBLE);
+                myFileViewHolder.fileCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        FileToSendPath path=new FileToSendPath();
+                        path.setPath(mFilesList[i].getPath());
+                        path.setType("File");
+                        if(isChecked) {
+                            SendActivity.mPathsList.add(path);
+                            buttonView.setChecked(true);
+                        }
+                        else{
+                            SendActivity.mPathsList.remove(SendActivity.getRefference(path));
+                        }
+                        SendActivity.UpdateView();
+                    }
+                });
+            myFileViewHolder.enterFolderButtton.setVisibility(View.GONE);}
+            if(mFilesList[i].isDirectory()){
+                myFileViewHolder.enterFolderButtton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String path=mFilesList[i].getPath();
+                        mFilesList=getFilesInDirectory(path);
+                        notifyItemRangeChanged(0,mFilesList.length);
+                        notifyDataSetChanged();
+                       Toast.makeText(getContext(), "Nexust", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
 
         @Override
@@ -106,12 +143,16 @@ public class Files extends Fragment {
         TextView fileName;
         TextView lastModified;
         ImageView folderIcon;
+        ImageView enterFolderButtton;
+        CheckBox fileCheckbox;
 
         public MyFileViewHolder(@NonNull View itemView) {
             super(itemView);
             fileName = itemView.findViewById(R.id.textview_file_name);
             lastModified = itemView.findViewById(R.id.textview_file_last_modified);
             folderIcon = itemView.findViewById(R.id.file_folder_icon);
+            enterFolderButtton = itemView.findViewById(R.id.enter_folder_button);
+            fileCheckbox = itemView.findViewById(R.id.file_checkbox);
         }
     }
 
