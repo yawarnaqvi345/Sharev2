@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.example.share.R;
 import com.example.share.ReceiveActivity;
 import com.example.share.SendActivity;
+import com.tml.sharethem.receiver.ReceiverActivity;
 
 
 public class Transfer extends Fragment {
@@ -54,7 +55,7 @@ public class Transfer extends Fragment {
                     Toast.makeText(getContext(), "Send pressed!!", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.button_recieve:
-                    Intent recIntent = new Intent(getContext(), ReceiveActivity.class);
+                    Intent recIntent = new Intent(getContext(), ReceiverActivity.class);
                     startActivity(recIntent);
                     Toast.makeText(getContext(), "Recieve Pressed!!", Toast.LENGTH_SHORT).show();
                     break;

@@ -125,7 +125,6 @@ public class Files extends Fragment {
                     public void onClick(View v) {
                         String path=mFilesList[i].getPath();
                         mFilesList=getFilesInDirectory(path);
-                        notifyItemRangeChanged(0,mFilesList.length);
                         notifyDataSetChanged();
                        Toast.makeText(getContext(), "Nexust", Toast.LENGTH_SHORT).show();
                     }

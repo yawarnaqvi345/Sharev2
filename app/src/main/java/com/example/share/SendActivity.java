@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.share.fragments.sendactivityfragments.ViewPagerAdapter;
+import com.tml.sharethem.sender.SHAREthemActivity;
+import com.tml.sharethem.sender.SHAREthemService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +58,13 @@ public class SendActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent shareIntent = new Intent(getApplicationContext(), FinalShareActivity.class);
-                startActivity(shareIntent);
+               // Intent shareIntent = new Intent(getApplicationContext(), FinalShareActivity.class);
+               // startActivity(shareIntent);
+                Intent intent = new Intent(getApplicationContext(), SHAREthemActivity.class);
+                intent.putExtra(SHAREthemService.EXTRA_FILE_PATHS, new String[]{mPathsList.get(0).getPath()});
+                intent.putExtra(SHAREthemService.EXTRA_PORT, 52287);
+                intent.putExtra(SHAREthemService.EXTRA_SENDER_NAME, "Sri");
+                startActivity(intent);
             }
         });
     }
