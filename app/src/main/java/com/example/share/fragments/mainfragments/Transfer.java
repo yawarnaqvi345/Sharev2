@@ -55,7 +55,7 @@ public class Transfer extends Fragment {
                     Toast.makeText(getContext(), "Send pressed!!", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.button_recieve:
-                    Intent recIntent = new Intent(getContext(), ReceiverActivity.class);
+                    Intent recIntent = new Intent(getContext(), ReceiveActivity.class);
                     startActivity(recIntent);
                     Toast.makeText(getContext(), "Recieve Pressed!!", Toast.LENGTH_SHORT).show();
                     break;
