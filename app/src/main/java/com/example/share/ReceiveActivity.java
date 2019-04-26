@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,12 +22,17 @@ import android.widget.TextView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.share.wifidirect.WiFiDirectBroadcastReceiver;
 
+import java.util.Collection;
+import java.util.List;
+
 public class ReceiveActivity extends AppCompatActivity {
     WifiP2pManager manager;
     WifiP2pManager.Channel mChannel;
     BroadcastReceiver receiver;
     LottieAnimationView animationView;
     ListView receiveListView;
+    Collection<WifiP2pDevice> list;
+    //LinearLayout listRecycler= findViewById()
 
     IntentFilter intentFilter;
     @Override
@@ -38,7 +44,7 @@ public class ReceiveActivity extends AppCompatActivity {
         mChannel = manager.initialize(this, getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(manager, mChannel, this);
         receiveListView=findViewById(R.id.receive_activity_listrview);
-       // ArrayAdapter<String> adptr=new ArrayAdapter(this,R.id.rec_devicename,);
+        ArrayAdapter<WifiP2pDevice> adptr=new ArrayAdapter(this,R.layout.receive_listview, (List) list);
        // receiveListView.setAdapter();
         intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);

@@ -8,4 +8,5 @@
     <string name="String_photos">Photos</string>
     <string name="String_videos">Videos</string>
     <string name="String_nusic">Music</string>
+    <string name="String_send">SEND</string>
 </resources>
