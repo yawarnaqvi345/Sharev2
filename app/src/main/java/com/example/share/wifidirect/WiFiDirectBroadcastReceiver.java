@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -14,9 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.share.R;
@@ -63,12 +66,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 public void onPeersAvailable(WifiP2pDeviceList peers) {
             Collection<WifiP2pDevice> list = peers.getDeviceList();
                     mList = new ArrayList<>(list);
-                  //  mList =(ArrayList<WifiP2pDevice>) peers.getDeviceList();
                     adapter=new MyListAdapter(mActivity,R.layout.receive_listview,mList);
                     listView.setAdapter(adapter);
                    TextView txt= mActivity.findViewById(R.id.receive_activity_text);
                     LottieAnimationView animationView=mActivity.findViewById(R.id.receive_animation_view);
-                 //  txt.setText(peers.toString());
                    txt.setVisibility(View.VISIBLE);
                    animationView.setVisibility(View.GONE);
                 }
@@ -100,12 +101,30 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) cxt
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rootView = inflater.inflate(R.layout.receive_listview, null);
             TextView txt=rootView.findViewById(R.id.rec_devicename);
             txt.setText(list.get(position).deviceName);
+            Button button=rootView.findViewById(R.id.send_to_device);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                  Toast.makeText(mActivity,list.get(position).deviceAddress, Toast.LENGTH_SHORT).show();
+                    WifiP2pConfig config = new WifiP2pConfig();
+                    config.deviceAddress=list.get(position).deviceAddress;
+                    mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(mActivity,"Connection successful", Toast.LENGTH_SHORT).show();
+                        }
+                        @Override
+                        public void onFailure(int reason) {
+                        }
+                    });
+                }
+            });
             return rootView;
         }
     }

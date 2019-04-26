@@ -57,7 +57,6 @@ public class ReceiveActivity extends AppCompatActivity {
         manager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                int a=3;
             }
 
             @Override
