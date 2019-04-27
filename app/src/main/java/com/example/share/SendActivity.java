@@ -58,13 +58,13 @@ public class SendActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // Intent shareIntent = new Intent(getApplicationContext(), FinalShareActivity.class);
-               // startActivity(shareIntent);
-                Intent intent = new Intent(getApplicationContext(), SHAREthemActivity.class);
-                intent.putExtra(SHAREthemService.EXTRA_FILE_PATHS, new String[]{mPathsList.get(0).getPath()});
-                intent.putExtra(SHAREthemService.EXTRA_PORT, 52287);
-                intent.putExtra(SHAREthemService.EXTRA_SENDER_NAME, "Sri");
-                startActivity(intent);
+                Intent shareIntent = new Intent(getApplicationContext(), FinalShareActivity.class);
+                startActivity(shareIntent);
+//                Intent intent = new Intent(getApplicationContext(), SHAREthemActivity.class);
+//                intent.putExtra(SHAREthemService.EXTRA_FILE_PATHS, new String[]{mPathsList.get(0).getPath()});
+//                intent.putExtra(SHAREthemService.EXTRA_PORT, 52287);
+//                intent.putExtra(SHAREthemService.EXTRA_SENDER_NAME, "Sri");
+//                startActivity(intent);
             }
         });
     }

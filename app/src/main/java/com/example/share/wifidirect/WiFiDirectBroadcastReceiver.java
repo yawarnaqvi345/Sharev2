@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -36,6 +37,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     ListView listView;
     MyListAdapter adapter;
     ArrayList<WifiP2pDevice> mList=null;
+    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel,
                                        Activity activity) {
@@ -58,6 +60,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // Wifi P2P is enabled
             } else {
                 // Wi-Fi P2P is not enabled
+
+
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             // Call WifiP2pManager.requestPeers() to get a list of current peers
