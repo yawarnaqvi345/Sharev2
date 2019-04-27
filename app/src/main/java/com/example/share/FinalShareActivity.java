@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -25,21 +26,26 @@ public class FinalShareActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_final_share);
-        view=findViewById(R.id.mainlayout);
+        view = findViewById(R.id.mainlayout);
+        // AdvertisingIdClient advertiserEndpointId;
 
-        EndpointDiscoveryCallback mEndpointDiscoveryCallback=new EndpointDiscoveryCallback() {
+        EndpointDiscoveryCallback mEndpointDiscoveryCallback = new EndpointDiscoveryCallback() {
             @Override
             public void onEndpointFound(String s, DiscoveredEndpointInfo discoveredEndpointInfo) {
-                int a=88;
-                Toast.makeText(getApplicationContext(),"onEndpointFound",Toast.LENGTH_SHORT).show();
-             //   Snackbar.make(view,"onEndpointFound",Snackbar.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "onEndpointFound", Toast.LENGTH_SHORT).show();
+                //   Snackbar.make(view,"onEndpointFound",Snackbar.LENGTH_SHORT).show();
+                Nearby.getConnectionsClient(getApplicationContext())
+                        .requestConnection(
+                                /* endpointName= */ discoveredEndpointInfo.getEndpointName(),
+                                discoveredEndpointInfo.getServiceId(),
+                                mConnectionLifecycleCallback);
             }
 
             @Override
             public void onEndpointLost(String s) {
-int b=54;
-                Toast.makeText(getApplicationContext(),"onEndpointLost",Toast.LENGTH_SHORT).show();
-                Snackbar.make(view,"onEndpointLost",Snackbar.LENGTH_SHORT).show();
+                int b = 54;
+                Toast.makeText(getApplicationContext(), "onEndpointLost", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "onEndpointLost", Snackbar.LENGTH_SHORT).show();
 
             }
         };
@@ -47,8 +53,26 @@ int b=54;
 
         Nearby.getConnectionsClient(this)
                 .startDiscovery(
-                        /* serviceId= */ "com.example.package_name",
+                        /* serviceId= */ getPackageName(),
                         mEndpointDiscoveryCallback,
                         new DiscoveryOptions(Strategy.P2P_CLUSTER));
     }
+
+   private final ConnectionLifecycleCallback mConnectionLifecycleCallback = new ConnectionLifecycleCallback() {
+        @Override
+        public void onConnectionInitiated(String s, ConnectionInfo connectionInfo) {
+            Toast.makeText(getApplicationContext(), "onConnectionInitiated", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onConnectionResult(String s, ConnectionResolution connectionResolution) {
+            Toast.makeText(getApplicationContext(), "onConnectionResult", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onDisconnected(String s) {
+            Toast.makeText(getApplicationContext(), "onDisconnected", Toast.LENGTH_SHORT).show();
+        }
+    };
+
 }

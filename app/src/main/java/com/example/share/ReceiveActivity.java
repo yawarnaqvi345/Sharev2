@@ -80,13 +80,11 @@ public class ReceiveActivity extends AppCompatActivity {
             @Override
             public void onConnectionInitiated(String s, ConnectionInfo connectionInfo) {
                 Toast.makeText(getApplicationContext(),"onConnectionInitiated",Toast.LENGTH_SHORT).show();
-                int a=34;
             }
 
             @Override
             public void onConnectionResult(String s, ConnectionResolution connectionResolution) {
                 Toast.makeText(getApplicationContext(),"onConnectionResult",Toast.LENGTH_SHORT).show();
-int b=54;
             }
 
             @Override
@@ -98,7 +96,7 @@ int b=54;
         Nearby.getConnectionsClient(this)
                 .startAdvertising(
                         /* endpointName= */ android.os.Build.MODEL,
-                        /* serviceId= */ "com.example.package_name",
+                        /* serviceId= */ getPackageName(),
                         mConnectionLifecycleCallback,
                         new AdvertisingOptions(Strategy.P2P_CLUSTER));
 
