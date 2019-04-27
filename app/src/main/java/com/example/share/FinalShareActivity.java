@@ -28,7 +28,6 @@ public class FinalShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_final_share);
         view = findViewById(R.id.mainlayout);
         // AdvertisingIdClient advertiserEndpointId;
-
         EndpointDiscoveryCallback mEndpointDiscoveryCallback = new EndpointDiscoveryCallback() {
             @Override
             public void onEndpointFound(String s, DiscoveredEndpointInfo discoveredEndpointInfo) {
@@ -43,7 +42,7 @@ public class FinalShareActivity extends AppCompatActivity {
 
             @Override
             public void onEndpointLost(String s) {
-                int b = 54;
+//                int b = 54;
                 Toast.makeText(getApplicationContext(), "onEndpointLost", Toast.LENGTH_SHORT).show();
                 Snackbar.make(view, "onEndpointLost", Snackbar.LENGTH_SHORT).show();
 
