@@ -73,6 +73,7 @@ public class Music extends Fragment {
            int Title = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
            int size = cursor.getColumnIndex(MediaStore.Audio.Media.SIZE);
            int length = cursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+           int path = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
 
            //Getting Song ID From Cursor.
            //int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
@@ -83,6 +84,9 @@ public class Music extends Fragment {
                //long SongID = cursor.getLong(id);
 
                String SongTitle = cursor.getString(Title);
+              // String types=cursor.getString(type);
+              // String songPath=uri+"/"+SongTitle+"."+types;
+               String songPath=cursor.getString(path);
                String songSize=cursor.getString(size);
                String songLength=cursor.getString(length);
                songLength=setCorrectDuration(songLength);
@@ -91,6 +95,7 @@ public class Music extends Fragment {
                track.setTitle(SongTitle);
                track.setSize(getFileSize(songSize));
                track.setLength(songLength);
+               track.setPath(songPath);
                mTracks.add(track);
            } while (cursor.moveToNext());
        }
@@ -126,7 +131,7 @@ public class Music extends Fragment {
                @Override
                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                    FileToSendPath path=new FileToSendPath();
-                   path.setPath(mTracks.get(pos).getTitle());
+                   path.setPath(mTracks.get(pos).getPath());
                    path.setType("Music");
                    if(isChecked) {
                        SendActivity.mPathsList.add(path);

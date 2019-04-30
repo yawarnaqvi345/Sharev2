@@ -11,6 +11,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.annotation.NonNull;
 import android.support.v4.text.PrecomputedTextCompat;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,8 +52,7 @@ public class ReceiveActivity extends AppCompatActivity {
     ListView receiveListView;
     Collection<WifiP2pDevice> list;
     TextView textView;
-    //LinearLayout listRecycler= findViewById()
-
+    String connectedDeviceId;
     IntentFilter intentFilter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,34 +60,6 @@ public class ReceiveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_receive);
         textView=findViewById(R.id.receive_activity_text);
         animationView=findViewById(R.id.receive_animation_view);
-
-      /*  WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifiManager.getWifiState()==WifiManager.WIFI_STATE_DISABLED)
-        wifiManager.setWifiEnabled(true);
-
-        manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = manager.initialize(this, getMainLooper(), null);
-        receiver = new WiFiDirectBroadcastReceiver(manager, mChannel, this);
-        receiveListView=findViewById(R.id.receive_activity_listrview);
-       // ArrayAdapter<WifiP2pDevice> adptr=new ArrayAdapter(this,R.layout.receive_listview, (List) list);
-       // receiveListView.setAdapter();
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        animationView=findViewById(R.id.receive_animation_view);
-
-
-        manager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-            }
-            @Override
-            public void onFailure(int reasonCode) {
-            }
-        });*/
-
         Nearby.getConnectionsClient(this)
                 .startAdvertising(
                         /* endpointName= */ android.os.Build.MODEL,
@@ -93,22 +67,29 @@ public class ReceiveActivity extends AppCompatActivity {
                         mConnectionLifecycleCallback,
                         new AdvertisingOptions(Strategy.P2P_CLUSTER));
 
+
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-//        registerReceiver(receiver, intentFilter);
     }
     @Override
     protected void onPause() {
         super.onPause();
-       // unregisterReceiver(receiver);
+        if(connectedDeviceId!=null)
+        Nearby.getConnectionsClient(this).disconnectFromEndpoint(connectedDeviceId);
     }
     ConnectionLifecycleCallback mConnectionLifecycleCallback=new ConnectionLifecycleCallback() {
         @Override
         public void onConnectionInitiated(final String s, ConnectionInfo connectionInfo) {
             Toast.makeText(getApplicationContext(),"onConnectionInitiated",Toast.LENGTH_SHORT).show();
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ReceiveActivity.this);
+          /*  AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
             alertDialogBuilder.setMessage(s+" wants to connect with this device");
                     alertDialogBuilder.setPositiveButton("Allow",
                             new DialogInterface.OnClickListener() {
@@ -128,10 +109,10 @@ public class ReceiveActivity extends AppCompatActivity {
             });
 
             AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-            Nearby.getConnectionsClient(ReceiveActivity.this)
-                    .stopAdvertising();
-          //  Nearby.getConnectionsClient(getApplicationContext()).acceptConnection(s, mPayLoadCallback);
+            alertDialog.show();*/
+//            Nearby.getConnectionsClient(ReceiveActivity.this)
+//                    .stopAdvertising();
+            Nearby.getConnectionsClient(getApplicationContext()).acceptConnection(s, mPayLoadCallback);
         }
 
         @Override
@@ -143,6 +124,7 @@ public class ReceiveActivity extends AppCompatActivity {
                     textView.setText("Connected to  "+s);
                     textView.setVisibility(View.VISIBLE);
                     animationView.setVisibility(View.INVISIBLE);
+                    connectedDeviceId=s;
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                     // The connection was rejected by one or both sides.
@@ -159,25 +141,88 @@ public class ReceiveActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Rejected Connection", Toast.LENGTH_SHORT).show();
                     break;
                 default:
+                    break;
                     // Unknown status code
             }
         }
 
         @Override
         public void onDisconnected(String s) {
-            int a=4;
         }
     };
-    PayloadCallback mPayLoadCallback= new PayloadCallback() {
+//    PayloadCallback mPayLoadCallback= new PayloadCallback() {
+//        @Override
+//        public void onPayloadReceived(String s, Payload payload) {
+//           int type=payload.getType();
+//            Toast.makeText(getApplicationContext(),"Payload Received",Toast.LENGTH_SHORT).show();
+//        }
+//
+//        @Override
+//        public void onPayloadTransferUpdate(String s, PayloadTransferUpdate payloadTransferUpdate) {
+//            Toast.makeText(getApplicationContext(),"Payload Updated",Toast.LENGTH_SHORT).show();
+//            payloadTransferUpdate.getPayloadId();
+//        }
+//    };
+PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
+
+    public class ReceiveFilePayloadCallback extends PayloadCallback {
+        private final SimpleArrayMap<Long, Payload> incomingFilePayloads = new SimpleArrayMap<>();
+        private final SimpleArrayMap<Long, Payload> completedFilePayloads = new SimpleArrayMap<>();
+        private final SimpleArrayMap<Long, String> filePayloadFilenames = new SimpleArrayMap<>();
+
         @Override
-        public void onPayloadReceived(String s, Payload payload) {
-            Toast.makeText(getApplicationContext(),"Payload Received",Toast.LENGTH_SHORT).show();
+        public void onPayloadReceived(String endpointId, Payload payload) {
+            if (payload.getType() == Payload.Type.BYTES) {
+                String payloadFilenameMessage = new String(payload.asBytes(), StandardCharsets.UTF_8);
+                long payloadId = addPayloadFilename(payloadFilenameMessage);
+                //processFilePayload(payloadId);
+            } else if (payload.getType() == Payload.Type.FILE) {
+                // Add this to our tracking map, so that we can retrieve the payload later.
+                incomingFilePayloads.put(payload.getId(), payload);
+            }
+        }
+
+        /**
+         * Extracts the payloadId and filename from the message and stores it in the
+         * filePayloadFilenames map. The format is payloadId:filename.
+         */
+        private long addPayloadFilename(String payloadFilenameMessage) {
+            String[] parts = payloadFilenameMessage.split(":");
+            long payloadId = Long.parseLong(parts[0]);
+            String filename = parts[1];
+            filePayloadFilenames.put(payloadId, filename);
+            return payloadId;
+        }
+
+        private void processFilePayload(long payloadId) {
+            // BYTES and FILE could be received in any order, so we call when either the BYTES or the FILE
+            // payload is completely received. The file payload is considered complete only when both have
+            // been received.
+            Payload filePayload = completedFilePayloads.get(payloadId);
+            String filename = filePayloadFilenames.get(payloadId);
+            if (filePayload != null && filename != null) {
+                completedFilePayloads.remove(payloadId);
+                filePayloadFilenames.remove(payloadId);
+
+                // Get the received file (which will be in the Downloads folder)
+                File payloadFile = filePayload.asFile().asJavaFile();
+
+                // Rename the file.
+                payloadFile.renameTo(new File(payloadFile.getParentFile(), filename));
+            }
         }
 
         @Override
-        public void onPayloadTransferUpdate(String s, PayloadTransferUpdate payloadTransferUpdate) {
-            Toast.makeText(getApplicationContext(),"Payload Updated",Toast.LENGTH_SHORT).show();
+        public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
+            if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
+                long payloadId = update.getPayloadId();
+                Payload payload= incomingFilePayloads.remove(payloadId);
+                completedFilePayloads.put(payloadId, payload);
+               // if (payload.getType() == Payload.Type.FILE) {
+                    processFilePayload(payloadId);
+               // }
+            }
         }
-    };
+    }
 
 }

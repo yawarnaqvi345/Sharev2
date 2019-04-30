@@ -7,6 +7,16 @@ public class Track{
     String length;
     String size;
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    String path;
+
     public String getTitle() {
         return title;
     }

@@ -9,6 +9,17 @@ public class AppIication {
     private String versionName = "";
     private int versionCode = 0;
     private Drawable icon;
+    private String path;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+
 
     public String getAppname() {
         return appname;

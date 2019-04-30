@@ -3,10 +3,14 @@ package com.example.share.fragments.sendactivityfragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,7 +28,9 @@ import com.example.share.R;
 import com.example.share.SendActivity;
 import com.example.share.models.AppIication;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -32,6 +39,7 @@ import java.util.List;
 public class Apps extends Fragment {
 
 GridView appsGridView;
+RelativeLayout anim;
 
     public Apps() {
         // Required empty public constructor
@@ -42,31 +50,14 @@ GridView appsGridView;
                              Bundle savedInstanceState) {
         View rootView=inflater.inflate(R.layout.fragment_apps, container, false);
         appsGridView=rootView.findViewById(R.id.apps_gridview);
+        anim=rootView.findViewById(R.id.loadingPanel);
        // ArrayList<AppIication> appsList=getInstalledApps(false);
+
+
         appsGridView.setAdapter(new AppsAdapter(getActivity()));
        // ArrayList<AppIication> appsList=getInstalledApps(false);
         // Inflate the layout for this fragment
         return rootView;
-    }
-
-
-    private ArrayList<AppIication> getInstalledApps(boolean getSysPackages) {
-        ArrayList<AppIication> appsList = new ArrayList<AppIication>();
-        List<PackageInfo> packs = getContext().getPackageManager().getInstalledPackages(0);
-        for(int i=0;i<packs.size();i++) {
-            PackageInfo p = packs.get(i);
-            if ((!getSysPackages) && (p.versionName == null)) {
-                continue ;
-            }
-            AppIication newApp = new AppIication();
-            newApp.setAppname(p.applicationInfo.loadLabel(getContext().getPackageManager()).toString());
-            newApp.setPname(p.packageName);
-           // newApp.setVersionName(p.versionName);
-           // newApp.setVersionCode(p.versionCode);
-            newApp.setIcon(p.applicationInfo.loadIcon(getContext().getPackageManager()));
-            appsList.add(newApp);
-        }
-        return appsList;
     }
 
     private class AppsAdapter extends BaseAdapter {
@@ -111,7 +102,7 @@ GridView appsGridView;
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     FileToSendPath path=new FileToSendPath();
-                    path.setPath(appList.get(position).getAppname());
+                    path.setPath(appList.get(position).getPath());
                     path.setType("Application");
                     if(isChecked) {
                         SendActivity.mPathsList.add(path);
@@ -141,5 +132,69 @@ GridView appsGridView;
             return rootView;
         }
     }
+    private ArrayList<AppIication> getInstalledApps(boolean getSysPackages) {
+        ArrayList<AppIication> appsList = new ArrayList<AppIication>();
+        List<PackageInfo> packs = getContext().getPackageManager().getInstalledPackages(0);
+        for(int i=0;i<packs.size();i++) {
+            PackageInfo p = packs.get(i);
+            ApplicationInfo a=p.applicationInfo;
+            File apk = new File(a.publicSourceDir);
+           // File apk = getApkFile(getContext(),p.packageName);
+           // Uri uri=Uri.parse(apk.getAbsolutePath());
+            String path=apk.getAbsolutePath();
+            if ((!getSysPackages) && (p.versionName == null)) {
+                continue ;
+            }
+            AppIication newApp = new AppIication();
+            newApp.setAppname(p.applicationInfo.loadLabel(getContext().getPackageManager()).toString());
+            newApp.setPname(p.packageName);
+            newApp.setPath(path);
+            // newApp.setVersionName(p.versionName);
+            // newApp.setVersionCode(p.versionCode);
+            newApp.setIcon(p.applicationInfo.loadIcon(getContext().getPackageManager()));
+            appsList.add(newApp);
+        }
+        return appsList;
+    }
+    private HashMap<String, String> getAllInstalledApkFiles(Context context) {
+        HashMap<String, String> installedApkFilePaths = new HashMap<>();
 
+        PackageManager packageManager = context.getPackageManager();
+        List<PackageInfo> packageInfoList = packageManager.getInstalledPackages(PackageManager.SIGNATURE_MATCH);
+
+        if (isValid(packageInfoList)) {
+            for (PackageInfo packageInfo : packageInfoList) {
+                ApplicationInfo applicationInfo;
+
+                applicationInfo = getApplicationInfoFrom(packageManager, packageInfo);
+
+                String packageName = applicationInfo.packageName;
+                String versionName = packageInfo.versionName;
+                int versionCode = packageInfo.versionCode;
+
+                File apkFile = new File(applicationInfo.publicSourceDir);
+                if (apkFile.exists()) {
+                    installedApkFilePaths.put(packageName, apkFile.getAbsolutePath());
+                    Log.d("tag",packageName + " = " + apkFile.getName());
+                }
+            }
+        }
+
+        return installedApkFilePaths;
+    }
+    private ApplicationInfo getApplicationInfoFrom(PackageManager packageManager, PackageInfo packageInfo) {
+        return packageInfo.applicationInfo;
+    }
+    private boolean isValid(List<PackageInfo> packageInfos) {
+        return packageInfos != null && !packageInfos.isEmpty();
+    }
+    public File getApkFile(Context context, String packageName) {
+        HashMap<String, String> installedApkFilePaths = getAllInstalledApkFiles(context);
+        File apkFile = new File(installedApkFilePaths.get(packageName));
+        if (apkFile.exists()) {
+            return apkFile;
+        }
+
+        return null;
+    }
 }

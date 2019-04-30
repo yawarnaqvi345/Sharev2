@@ -34,6 +34,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,8 @@ public class FinalShareActivity extends AppCompatActivity {
     File fileToSend;
      List<FileToSendPath> mPathsList;
      Payload filePayload;
+     String connectedDeviceId;
+    Uri uri;
 
 
     @Override
@@ -51,10 +54,12 @@ public class FinalShareActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_final_share);
         mPathsList=SendActivity.mPathsList;
-        Uri uri= Uri.fromFile(new File(mPathsList.get(0).path));
+        uri= Uri.fromFile(new File(mPathsList.get(0).path));
+       // File file=new File(mPathsList.get(0).path);
         try {
             ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "r");
             filePayload = Payload.fromFile(pfd);
+            //filePayload = Payload.fromFile(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -107,7 +112,19 @@ public class FinalShareActivity extends AppCompatActivity {
                         new DiscoveryOptions(Strategy.P2P_CLUSTER));
     }
 
-   private final ConnectionLifecycleCallback mConnectionLifecycleCallback = new ConnectionLifecycleCallback() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(connectedDeviceId!=null)
+            Nearby.getConnectionsClient(this).disconnectFromEndpoint(connectedDeviceId);
+    }
+
+    private final ConnectionLifecycleCallback mConnectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override
         public void onConnectionInitiated(String s, ConnectionInfo connectionInfo) {
             Toast.makeText(getApplicationContext(), "onConnectionInitiated", Toast.LENGTH_SHORT).show();
@@ -121,8 +138,40 @@ public class FinalShareActivity extends AppCompatActivity {
             switch (connectionResolution.getStatus().getStatusCode()) {
                 case ConnectionsStatusCodes.STATUS_OK:
                    finalshareTextView.setText("connected to "+s);
-
-                    Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
+                    connectedDeviceId=s;
+                    int index=0;
+                    for(FileToSendPath path:mPathsList){
+                        uri= Uri.fromFile(new File(mPathsList.get(index).path));
+                        // File file=new File(mPathsList.get(0).path);
+                        try {
+                            ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "r");
+                            filePayload = Payload.fromFile(pfd);
+                            //filePayload = Payload.fromFile(file);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        String filenameMessage = filePayload.getId() + ":" + uri.getLastPathSegment();
+                        Payload filenameBytesPayload =
+                                Payload.fromBytes(filenameMessage.getBytes(StandardCharsets.UTF_8));
+                        Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filenameBytesPayload);
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
+                        index++;
+                    }
+//                    String filenameMessage = filePayload.getId() + ":" + uri.getLastPathSegment();
+//                    Payload filenameBytesPayload =
+//                            Payload.fromBytes(filenameMessage.getBytes(StandardCharsets.UTF_8));
+//                    Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filenameBytesPayload);
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
                     Toast.makeText(getApplicationContext(), "Connection Accepted", Toast.LENGTH_SHORT).show();
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
@@ -154,6 +203,11 @@ public class FinalShareActivity extends AppCompatActivity {
         @Override
         public void onPayloadTransferUpdate(String s, PayloadTransferUpdate payloadTransferUpdate) {
             Toast.makeText(getApplicationContext(),"Payload Updated",Toast.LENGTH_SHORT).show();
+            if (payloadTransferUpdate.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
+                long payloadId = payloadTransferUpdate.getPayloadId();
+               // Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
+                // }
+            }
         }
     };
 
