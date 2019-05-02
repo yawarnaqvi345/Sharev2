@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -23,12 +24,14 @@ import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.share.FileToSendPath;
 import com.example.share.R;
 import com.example.share.SendActivity;
+import com.example.share.models.AppIication;
 
 import java.util.ArrayList;
 
@@ -38,8 +41,8 @@ import java.util.ArrayList;
 public class Photos extends Fragment {
     GridView photosGridView;
    LinearLayout photoLinearLayout;
+   RelativeLayout progress;
     private ArrayList<String> images;
-
     public Photos() {
         // Required empty public constructor
     }
@@ -51,20 +54,11 @@ public class Photos extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_photos, container, false);
         photosGridView = rootView.findViewById(R.id.photos_grid_view);
         photoLinearLayout = rootView.findViewById(R.id.photo_linear_layout);
-        photosGridView.setAdapter(new ImageAdapter(getActivity()));
-//        photosGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> arg0, View arg1,
-//                                    int position, long arg3) {
-//              //  photoLinearLayout.setLayoutParams(Para);
-//                if (null != images && !images.isEmpty())
-//                    Toast.makeText(
-//                            getActivity().getApplicationContext(),
-//                            "position " + position + " " + images.get(position),
-//                            Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        progress = rootView.findViewById(R.id.photo_loadingPanel);
+        new AsyncTaskRunner().execute();
+      //  images = getAllShownImagesPath(getActivity());
+       // photosGridView.setAdapter(new ImageAdapter(getActivity(),images));
+
         return rootView;
     }
     private ArrayList<String> getAllShownImagesPath(Context activity) {
@@ -97,9 +91,9 @@ public class Photos extends Fragment {
          *
          * @param localContext the local context
          */
-        public ImageAdapter(Activity localContext) {
+        public ImageAdapter(Activity localContext,ArrayList<String> imags) {
             context = localContext;
-            images = getAllShownImagesPath(context);
+            images = imags;
         }
         public int getCount() {
             return images.size();
@@ -168,6 +162,35 @@ public class Photos extends Fragment {
         }
         return null;
    }
+
+    private class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+        ArrayList<AppIication> appList;
+        //  private String resp;
+        // ProgressDialog progressDialog;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            images = getAllShownImagesPath(getActivity());
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            photosGridView.setAdapter(new ImageAdapter(getActivity(),images));
+            photosGridView.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE );
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            photosGridView.setVisibility(View.GONE);
+        }
+
+
+
+    }
 
 
 }

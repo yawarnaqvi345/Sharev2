@@ -2,11 +2,13 @@ package com.example.share.fragments.sendactivityfragments;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -54,9 +56,9 @@ RelativeLayout anim;
        // ArrayList<AppIication> appsList=getInstalledApps(false);
 
 
-        appsGridView.setAdapter(new AppsAdapter(getActivity()));
        // ArrayList<AppIication> appsList=getInstalledApps(false);
         // Inflate the layout for this fragment
+        new AsyncTaskRunner().execute();
         return rootView;
     }
 
@@ -71,9 +73,9 @@ RelativeLayout anim;
          *
          * @param localContext the local context
          */
-        public AppsAdapter(Activity localContext) {
+        public AppsAdapter(Activity localContext,ArrayList<AppIication> applicationList) {
             context = localContext;
-            appList=getInstalledApps(false);;
+            appList=applicationList;
             //ArrayList<AppIication> appsList=getInstalledApps(false);
           //  images = getAllShownImagesPath(context);
         }
@@ -196,5 +198,40 @@ RelativeLayout anim;
         }
 
         return null;
+    }
+    private class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+        ArrayList<AppIication> appList;
+      //  private String resp;
+       // ProgressDialog progressDialog;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            appList=getInstalledApps(false);
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // execution of result of Long time consuming operation
+           // progressDialog.dismiss();
+            appsGridView.setAdapter(new AppsAdapter(getActivity(),appList));
+            appsGridView.setVisibility(View.VISIBLE);
+            anim.setVisibility(View.GONE);
+
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+           // progressDialog = ProgressDialog.show(getContext(),
+                   // "Please Wait",
+                   // "Loading");
+            appsGridView.setVisibility(View.GONE);
+        }
+
+
+
     }
 }

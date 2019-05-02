@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -17,12 +18,14 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.share.FileToSendPath;
 import com.example.share.R;
 import com.example.share.SendActivity;
+import com.example.share.models.AppIication;
 
 import java.util.ArrayList;
 
@@ -33,6 +36,7 @@ public class Videos extends Fragment {
     private ArrayList<String> videos;
     GridView videoGridView;
     View rootViewMain;
+    RelativeLayout progress;
 
 
     public Videos() {
@@ -45,8 +49,11 @@ public class Videos extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_videos, container, false);
        // rootViewMain = rootView;
+        progress=rootView.findViewById(R.id.video_loadingPanel);
         videoGridView = rootView.findViewById(R.id.videos_grid_view);
-        videoGridView.setAdapter(new VideoAdapter(getActivity()));
+        new AsyncTaskRunner().execute();
+
+
 
         // Inflate the layout for this fragment
         return rootView;
@@ -54,7 +61,7 @@ public class Videos extends Fragment {
 
 
     private class VideoAdapter extends BaseAdapter {
-
+        private ArrayList<String> videos;
         /**
          * The context.
          */
@@ -66,9 +73,10 @@ public class Videos extends Fragment {
          *
          * @param localContext the local context
          */
-        public VideoAdapter(Activity localContext) {
+        public VideoAdapter(Activity localContext, ArrayList<String> vids) {
             context = localContext;
-            videos = getAllShownVideoPath(context);
+            videos=vids;
+
         }
 
         public int getCount() {
@@ -152,6 +160,29 @@ public class Videos extends Fragment {
             listOfAllVideos.add(absolutePathOfVideo);
         }
         return listOfAllVideos;
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            videos = getAllShownVideoPath(getActivity());
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            videoGridView.setAdapter(new VideoAdapter(getActivity(),videos));
+            progress.setVisibility(View.GONE );
+            videoGridView.setVisibility(View.VISIBLE);
+        }
+        @Override
+        protected void onPreExecute() {
+            videoGridView.setVisibility(View.GONE);
+        }
+
+
+
     }
 
 }

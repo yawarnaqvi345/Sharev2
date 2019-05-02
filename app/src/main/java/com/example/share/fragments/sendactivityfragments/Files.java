@@ -1,6 +1,7 @@
 package com.example.share.fragments.sendactivityfragments;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -14,12 +15,15 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.share.FileToSendPath;
 import com.example.share.R;
 import com.example.share.SendActivity;
+import com.example.share.models.AppIication;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -37,6 +41,8 @@ import java.util.List;
 public class Files extends Fragment {
     File[] files;
     String path=Environment.getExternalStorageDirectory().toString();
+    RecyclerView fileRecycler;
+    RelativeLayout progress;
 
 
     public Files() {
@@ -49,10 +55,13 @@ public class Files extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_files, container, false);
 
-        files = getFilesInDirectory(path);
-        RecyclerView fileRecycler = rootView.findViewById(R.id.files_recycler_view);
+
+        fileRecycler = rootView.findViewById(R.id.files_recycler_view);
         fileRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        fileRecycler.setAdapter(new FileRecyclerViewAdapter(files));
+        progress=rootView.findViewById(R.id.file_loadingPanel);
+        new AsyncTaskRunner().execute();
+//        files = getFilesInDirectory(path);
+//        fileRecycler.setAdapter(new FileRecyclerViewAdapter(files));
 
         // Inflate the layout for this fragment
         return rootView;
@@ -153,6 +162,34 @@ public class Files extends Fragment {
             enterFolderButtton = itemView.findViewById(R.id.enter_folder_button);
             fileCheckbox = itemView.findViewById(R.id.file_checkbox);
         }
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+        ArrayList<AppIication> appList;
+        //  private String resp;
+        // ProgressDialog progressDialog;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            files = getFilesInDirectory(path);
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            fileRecycler.setAdapter(new FileRecyclerViewAdapter(files));
+            fileRecycler.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+        }
+        @Override
+        protected void onPreExecute() {
+           fileRecycler.setVisibility(View.GONE);
+        }
+
+
+
     }
 
 }

@@ -1,11 +1,28 @@
 package com.example.share;
 
 public class FileToSendPath {
+
+
+    String name;
     String path;
     String type;
-   public FileToSendPath(){
+    int progress;
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public int getProgress() {
+        return progress;
+    }
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+    public FileToSendPath(){
         path=null;
         type=null;
+        progress=0;
     }
     public String getPath() {
         return path;

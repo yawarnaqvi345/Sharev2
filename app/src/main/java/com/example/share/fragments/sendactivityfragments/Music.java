@@ -4,6 +4,7 @@ package com.example.share.fragments.sendactivityfragments;
 import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ import java.util.List;
 public class Music extends Fragment {
     List<Track> tracks;
     RecyclerView recyclerView;
+    RelativeLayout progress;
     public Music() {
         // Required empty public constructor
     }
@@ -41,11 +44,10 @@ public class Music extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_music, container, false);
+        progress=rootView.findViewById(R.id.music_loadingPanel);
         recyclerView =  rootView.findViewById(R.id.music_recyclerview);
-        tracks = getAllMusicTracks();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RecyclerViewAdapter(tracks));
-        // Inflate the layout for this fragment
+       new AsyncTaskRunner().execute();
         return rootView;
     }
 
@@ -204,6 +206,29 @@ public class Music extends Fragment {
         }
 
         return modifiedFileSize;
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            tracks = getAllMusicTracks();
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            recyclerView.setAdapter(new RecyclerViewAdapter(tracks));
+            recyclerView.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+        }
+        @Override
+        protected void onPreExecute() {
+            recyclerView.setVisibility(View.GONE);
+        }
+
+
+
     }
 
 }

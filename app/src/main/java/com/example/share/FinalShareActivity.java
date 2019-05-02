@@ -9,12 +9,19 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.share.fragments.sendactivityfragments.Files;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
@@ -47,6 +54,9 @@ public class FinalShareActivity extends AppCompatActivity {
      Payload filePayload;
      String connectedDeviceId;
     Uri uri;
+    RecyclerView recyclerView;
+    private SimpleArrayMap<Long, Integer> recyclerIdPosition = new SimpleArrayMap<>();
+    MyAdapter myAdapter;
 
 
     @Override
@@ -54,20 +64,13 @@ public class FinalShareActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_final_share);
         mPathsList=SendActivity.mPathsList;
-        uri= Uri.fromFile(new File(mPathsList.get(0).path));
-       // File file=new File(mPathsList.get(0).path);
-        try {
-            ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "r");
-            filePayload = Payload.fromFile(pfd);
-            //filePayload = Payload.fromFile(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        recyclerView=findViewById(R.id.finalshare_recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        myAdapter=new MyAdapter();
+        recyclerView.setAdapter(myAdapter);
 
 
         finalshareTextView=findViewById(R.id.finalshare_activity_text);
-     //   view = findViewById(R.id.mainlayout);
-        // AdvertisingIdClient advertiserEndpointId;
         EndpointDiscoveryCallback mEndpointDiscoveryCallback = new EndpointDiscoveryCallback() {
             @Override
             public void onEndpointFound(String s, DiscoveredEndpointInfo discoveredEndpointInfo) {
@@ -109,7 +112,7 @@ public class FinalShareActivity extends AppCompatActivity {
                 .startDiscovery(
                         /* serviceId= */ getPackageName(),
                         mEndpointDiscoveryCallback,
-                        new DiscoveryOptions(Strategy.P2P_CLUSTER));
+                        new DiscoveryOptions(Strategy.P2P_STAR));
     }
 
     @Override
@@ -160,6 +163,7 @@ public class FinalShareActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
+                        recyclerIdPosition.put(filePayload.getId(),index);
                         index++;
                     }
 //                    String filenameMessage = filePayload.getId() + ":" + uri.getLastPathSegment();
@@ -205,11 +209,72 @@ public class FinalShareActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Payload Updated",Toast.LENGTH_SHORT).show();
             if (payloadTransferUpdate.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                 long payloadId = payloadTransferUpdate.getPayloadId();
-               // Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
-                // }
+              //  int pos=recyclerIdPosition.get(payloadId);
+              //  mPathsList.get(pos).setProgress((int) ((payloadTransferUpdate.getBytesTransferred()/payloadTransferUpdate.getTotalBytes())*100));
+               // Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload)// }
+            }
+            if (payloadTransferUpdate.getStatus() == PayloadTransferUpdate.Status.IN_PROGRESS){
+                if(recyclerIdPosition.get(payloadTransferUpdate.getPayloadId())!=null) {
+                    int pos = recyclerIdPosition.get(payloadTransferUpdate.getPayloadId());
+                    float btrans=payloadTransferUpdate.getBytesTransferred();
+                    float btotal=payloadTransferUpdate.getTotalBytes();
+                    float factor=btrans/btotal;
+                    float progpercentage=factor*100;
+                    mPathsList.get(pos).setProgress((int)progpercentage );
+                    myAdapter.notifyItemChanged(pos);
+                }
             }
         }
     };
+
+
+
+
+
+    class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
+        @NonNull
+        @Override
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
+            View recyclerFile = layoutInflater.inflate(R.layout.filetoshare_recycler, viewGroup, false);
+            // RecyclerView.ViewHolder viewHolder = new RecyclerView.ViewHolder(listItem);
+          MyViewHolder viewHolder = new MyViewHolder(recyclerFile);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
+            myViewHolder.fileName.setText( Uri.parse(mPathsList.get(i).path).getLastPathSegment());
+            myViewHolder.progressBar.setProgress(mPathsList.get(i).progress);
+            if (String.valueOf(mPathsList.get(i).progress).equalsIgnoreCase("100")){
+                myViewHolder.percentageText.setText("Completed!");
+
+            }else{
+                myViewHolder.percentageText.setText(String.valueOf(mPathsList.get(i).progress)+" %");
+
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return mPathsList.size();
+        }
+    }
+    class MyViewHolder extends RecyclerView.ViewHolder{
+        TextView fileName;
+        ProgressBar progressBar;
+        TextView percentageText;
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            fileName=itemView.findViewById(R.id.finalshare_file_name);
+            progressBar=itemView.findViewById(R.id.finalshare_recycler_progressbar);
+            percentageText=itemView.findViewById(R.id.percentage_text);
+            progressBar.setIndeterminate(false);
+            progressBar.setMax(100);
+
+        }
+    }
+
 
 
 }

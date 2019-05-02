@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.database.DataSetObserver;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -15,13 +16,16 @@ import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +45,7 @@ import com.google.android.gms.nearby.connection.Strategy;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,18 +59,31 @@ public class ReceiveActivity extends AppCompatActivity {
     TextView textView;
     String connectedDeviceId;
     IntentFilter intentFilter;
+    List<FileToSendPath> mPathsList;
+    RecyclerView myRecyclerView;
+    MyAdapter myAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive);
+        mPathsList = new ArrayList<>();
+        FileToSendPath d=new FileToSendPath();
+        d.setName(" ");
+        mPathsList.add(d);
         textView=findViewById(R.id.receive_activity_text);
         animationView=findViewById(R.id.receive_animation_view);
+        myRecyclerView=findViewById(R.id.receive_recycler);
+        myRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        myAdapter=new MyAdapter(mPathsList);
+        myRecyclerView.setAdapter(myAdapter);
+
+
         Nearby.getConnectionsClient(this)
                 .startAdvertising(
                         /* endpointName= */ android.os.Build.MODEL,
                         /* serviceId= */ getPackageName(),
                         mConnectionLifecycleCallback,
-                        new AdvertisingOptions(Strategy.P2P_CLUSTER));
+                        new AdvertisingOptions(Strategy.P2P_STAR));
 
 
     }
@@ -123,7 +141,8 @@ public class ReceiveActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Connection Accepted", Toast.LENGTH_SHORT).show();
                     textView.setText("Connected to  "+s);
                     textView.setVisibility(View.VISIBLE);
-                    animationView.setVisibility(View.INVISIBLE);
+                    animationView.setVisibility(View.GONE);
+                    myRecyclerView.setVisibility(View.VISIBLE);
                     connectedDeviceId=s;
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
@@ -169,6 +188,9 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
         private final SimpleArrayMap<Long, Payload> incomingFilePayloads = new SimpleArrayMap<>();
         private final SimpleArrayMap<Long, Payload> completedFilePayloads = new SimpleArrayMap<>();
         private final SimpleArrayMap<Long, String> filePayloadFilenames = new SimpleArrayMap<>();
+        private final SimpleArrayMap<Long, Integer> fileIdPosition = new SimpleArrayMap<>();
+        int index=1;
+
 
         @Override
         public void onPayloadReceived(String endpointId, Payload payload) {
@@ -179,6 +201,12 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
             } else if (payload.getType() == Payload.Type.FILE) {
                 // Add this to our tracking map, so that we can retrieve the payload later.
                 incomingFilePayloads.put(payload.getId(), payload);
+                FileToSendPath file=new FileToSendPath();
+                file.setName(filePayloadFilenames.get(payload.getId()));
+                mPathsList.add(file);
+                myAdapter.notifyDataSetChanged();
+                fileIdPosition.put(payload.getId(),index);
+                index++;
             }
         }
 
@@ -189,6 +217,7 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
         private long addPayloadFilename(String payloadFilenameMessage) {
             String[] parts = payloadFilenameMessage.split(":");
             long payloadId = Long.parseLong(parts[0]);
+
             String filename = parts[1];
             filePayloadFilenames.put(payloadId, filename);
             return payloadId;
@@ -224,5 +253,62 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
             }
         }
     }
+
+
+
+
+
+
+
+
+    class MyAdapter extends RecyclerView.Adapter<MyViewHolder>{
+      //  List<FileToSendPath> mPathsList;
+        public MyAdapter(List<FileToSendPath> mPathsListR) {
+          //  mPathsList=mPathsListR;
+        }
+
+        @NonNull
+        @Override
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
+            View recyclerFile = layoutInflater.inflate(R.layout.filetoshare_recycler, viewGroup, false);
+            MyViewHolder viewHolder = new MyViewHolder(recyclerFile);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
+            myViewHolder.fileName.setText( Uri.parse(mPathsList.get(i).path).getLastPathSegment());
+            myViewHolder.progressBar.setProgress(mPathsList.get(i).progress);
+            if (String.valueOf(mPathsList.get(i).progress).equalsIgnoreCase("100")){
+                myViewHolder.percentageText.setText("Completed!");
+
+            }else{
+                myViewHolder.percentageText.setText(String.valueOf(mPathsList.get(i).progress)+" %");
+
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return mPathsList.size();
+        }
+    }
+    class MyViewHolder extends RecyclerView.ViewHolder{
+        TextView fileName;
+        ProgressBar progressBar;
+        TextView percentageText;
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            fileName=itemView.findViewById(R.id.finalshare_file_name);
+            progressBar=itemView.findViewById(R.id.finalshare_recycler_progressbar);
+            percentageText=itemView.findViewById(R.id.percentage_text);
+            progressBar.setIndeterminate(false);
+            progressBar.setMax(100);
+
+        }
+    }
+
+
 
 }

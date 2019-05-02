@@ -18,8 +18,10 @@
 
         />
     <LinearLayout
+        android:id="@+id/receive_linear_else"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:layout_gravity="center"
         android:gravity="center_vertical"
         >
@@ -38,5 +40,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></ListView>
     </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/receive_recycler"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
 
 </LinearLayout>
