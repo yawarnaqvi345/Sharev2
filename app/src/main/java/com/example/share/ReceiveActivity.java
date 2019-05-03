@@ -37,6 +37,7 @@ import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
+import com.google.android.gms.nearby.connection.ConnectionsClient;
 import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
@@ -94,7 +95,7 @@ public class ReceiveActivity extends AppCompatActivity {
                         /* endpointName= */ android.os.Build.MODEL,
                         /* serviceId= */ getPackageName(),
                         mConnectionLifecycleCallback,
-                        new AdvertisingOptions(Strategy.P2P_STAR));
+                        new AdvertisingOptions(Strategy.P2P_POINT_TO_POINT));
 
 
     }
@@ -209,10 +210,11 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
 
         @Override
         public void onPayloadReceived(String endpointId, Payload payload) {
+          //  incomingFilePayloads.put(payload.getId(), payload);
             if (payload.getType() == Payload.Type.BYTES) {
                 String payloadFilenameMessage = new String(payload.asBytes(), StandardCharsets.UTF_8);
                 long payloadId = addPayloadFilename(payloadFilenameMessage);
-                //processFilePayload(payloadId);
+                processFilePayload(payloadId);
             } else if (payload.getType() == Payload.Type.FILE) {
 
 
@@ -256,10 +258,8 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
             if (filePayload != null && filename != null) {
                 completedFilePayloads.remove(payloadId);
                 filePayloadFilenames.remove(payloadId);
-
                 // Get the received file (which will be in the Downloads folder)
                 File payloadFile = filePayload.asFile().asJavaFile();
-
                 // Rename the file.
                 payloadFile.renameTo(new File(payloadFile.getParentFile(), filename));
             }
@@ -271,9 +271,9 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
                 long payloadId = update.getPayloadId();
                 Payload payload= incomingFilePayloads.remove(payloadId);
                 completedFilePayloads.put(payloadId, payload);
-               // if (payload.getType() == Payload.Type.FILE) {
+//                if (payload.getType() == Payload.Type.FILE) {
                     processFilePayload(payloadId);
-               // }
+  //              }
             }
            else if ((update.getStatus() == PayloadTransferUpdate.Status.IN_PROGRESS) &&  (fileIdType.get(update.getPayloadId())==Payload.Type.FILE) ) {
                 float btrans=update.getBytesTransferred();

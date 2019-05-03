@@ -1,14 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.mainfragments.TextStream">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/upper_linear"
+        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Its Text dtream fragmemt" />
+       android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:padding="8dp"
+        android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/button_broadcast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/roundedbutton"
+        android:text="BroadCast" />
+    <Button
+        android:layout_toRightOf="@+id/button_broadcast"
+        android:id="@+id/button_Discover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/roundedbutton"
+        android:text="Discover" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/dev_info"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/upper_linear"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/dev_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Device"/>
+        <Button
+            android:layout_toRightOf="@+id/button_broadcast"
+            android:id="@+id/connect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:background="@drawable/roundedbutton"
+            android:text="Connect" />
+    </LinearLayout>
 
-</FrameLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/text_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"></android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:id="@+id/write_message_layout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <Button
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/send_message_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"/>
+    </LinearLayout>
+
+</RelativeLayout>

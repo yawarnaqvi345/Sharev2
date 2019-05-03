@@ -21,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,6 +43,8 @@ public class Apps extends Fragment {
 
 GridView appsGridView;
 RelativeLayout anim;
+ProgressBar progressBar;
+AsyncTask asy;
 
     public Apps() {
         // Required empty public constructor
@@ -53,12 +56,15 @@ RelativeLayout anim;
         View rootView=inflater.inflate(R.layout.fragment_apps, container, false);
         appsGridView=rootView.findViewById(R.id.apps_gridview);
         anim=rootView.findViewById(R.id.loadingPanel);
+        progressBar=rootView.findViewById(R.id.progressBar);
        // ArrayList<AppIication> appsList=getInstalledApps(false);
 
 
        // ArrayList<AppIication> appsList=getInstalledApps(false);
         // Inflate the layout for this fragment
-        new AsyncTaskRunner().execute();
+
+       asy = new AsyncTaskRunner().execute();
+
         return rootView;
     }
 
@@ -229,6 +235,7 @@ RelativeLayout anim;
                    // "Please Wait",
                    // "Loading");
             appsGridView.setVisibility(View.GONE);
+
         }
 
 

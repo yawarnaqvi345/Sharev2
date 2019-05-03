@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.share.fragments.sendactivityfragments.Files;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+//import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -38,6 +38,7 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.nearby.messages.internal.Update;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.tml.sharethem.sender.NanoHTTPD;
@@ -156,7 +157,7 @@ public class FinalShareActivity extends AppCompatActivity {
                 .startDiscovery(
                         /* serviceId= */ getPackageName(),
                         mEndpointDiscoveryCallback,
-                        new DiscoveryOptions(Strategy.P2P_STAR));
+                        new DiscoveryOptions(Strategy.P2P_POINT_TO_POINT));
     }
 
     @Override

@@ -9,6 +9,7 @@
   <LinearLayout
       android:id="@+id/history_section"
       android:layout_width="match_parent"
+      android:orientation="vertical"
       android:layout_height="wrap_content"
       android:layout_weight="8"/>
 
@@ -26,6 +27,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:background="@drawable/roundedbutton"
             android:text="Send" />
 
@@ -35,6 +38,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:background="@drawable/roundedbutton"
             android:text="Recieve" />
     </LinearLayout>

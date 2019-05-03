@@ -30,6 +30,12 @@ public class SendActivity extends AppCompatActivity {
     public static ImageView sendButton;
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "OnCreate");

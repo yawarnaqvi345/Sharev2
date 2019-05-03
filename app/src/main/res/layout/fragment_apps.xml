@@ -8,20 +8,22 @@
     <!-- TODO: Update blank fragment layout -->
     <GridView
         android:id="@+id/apps_gridview"
-        android:layout_margin="5dp"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:numColumns="4"
-        android:verticalSpacing="15dp"
+        android:layout_margin="5dp"
+        android:gravity="center"
         android:horizontalSpacing="7dp"
-        android:gravity="center"></GridView>
+        android:numColumns="4"
+        android:verticalSpacing="15dp"></GridView>
+
     <RelativeLayout
         android:id="@+id/loadingPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center" >
+        android:gravity="center">
 
         <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="true" />
