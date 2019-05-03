@@ -62,20 +62,31 @@ public class ReceiveActivity extends AppCompatActivity {
     List<FileToSendPath> mPathsList;
     RecyclerView myRecyclerView;
     MyAdapter myAdapter;
+    LinearLayout elseLinear;
+    private SimpleArrayMap<String, String> deviceName = new SimpleArrayMap<>();
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive);
         mPathsList = new ArrayList<>();
-        FileToSendPath d=new FileToSendPath();
-        d.setName(" ");
-        mPathsList.add(d);
+      //  FileToSendPath d=new FileToSendPath();
+       // d.setName(" ");
+       // mPathsList.add(d);
         textView=findViewById(R.id.receive_activity_text);
         animationView=findViewById(R.id.receive_animation_view);
+        elseLinear=findViewById(R.id.receive_linear_else);
         myRecyclerView=findViewById(R.id.receive_recycler);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        myAdapter=new MyAdapter(mPathsList);
-        myRecyclerView.setAdapter(myAdapter);
+
+//        myAdapter=new MyAdapter(mPathsList);
+//        myRecyclerView.setAdapter(myAdapter);
 
 
         Nearby.getConnectionsClient(this)
@@ -102,12 +113,14 @@ public class ReceiveActivity extends AppCompatActivity {
         super.onPause();
         if(connectedDeviceId!=null)
         Nearby.getConnectionsClient(this).disconnectFromEndpoint(connectedDeviceId);
+        Nearby.getConnectionsClient(this).stopAdvertising();
     }
     ConnectionLifecycleCallback mConnectionLifecycleCallback=new ConnectionLifecycleCallback() {
         @Override
         public void onConnectionInitiated(final String s, ConnectionInfo connectionInfo) {
+            deviceName.put(s,connectionInfo.getEndpointName());
             Toast.makeText(getApplicationContext(),"onConnectionInitiated",Toast.LENGTH_SHORT).show();
-          /*  AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ReceiveActivity.this);
             alertDialogBuilder.setMessage(s+" wants to connect with this device");
                     alertDialogBuilder.setPositiveButton("Allow",
                             new DialogInterface.OnClickListener() {
@@ -127,10 +140,10 @@ public class ReceiveActivity extends AppCompatActivity {
             });
 
             AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();*/
+            alertDialog.show();
 //            Nearby.getConnectionsClient(ReceiveActivity.this)
 //                    .stopAdvertising();
-            Nearby.getConnectionsClient(getApplicationContext()).acceptConnection(s, mPayLoadCallback);
+          //  Nearby.getConnectionsClient(getApplicationContext()).acceptConnection(s, mPayLoadCallback);
         }
 
         @Override
@@ -139,10 +152,11 @@ public class ReceiveActivity extends AppCompatActivity {
             switch (connectionResolution.getStatus().getStatusCode()) {
                 case ConnectionsStatusCodes.STATUS_OK:
                     Toast.makeText(getApplicationContext(), "Connection Accepted", Toast.LENGTH_SHORT).show();
-                    textView.setText("Connected to  "+s);
+                    textView.setText("Connected to  " +  deviceName.get(s));
                     textView.setVisibility(View.VISIBLE);
                     animationView.setVisibility(View.GONE);
                     myRecyclerView.setVisibility(View.VISIBLE);
+                    elseLinear.setVisibility(View.GONE);
                     connectedDeviceId=s;
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
@@ -189,7 +203,8 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
         private final SimpleArrayMap<Long, Payload> completedFilePayloads = new SimpleArrayMap<>();
         private final SimpleArrayMap<Long, String> filePayloadFilenames = new SimpleArrayMap<>();
         private final SimpleArrayMap<Long, Integer> fileIdPosition = new SimpleArrayMap<>();
-        int index=1;
+        private final SimpleArrayMap<Long, Integer> fileIdType = new SimpleArrayMap<>();
+        int index=0;
 
 
         @Override
@@ -199,15 +214,24 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
                 long payloadId = addPayloadFilename(payloadFilenameMessage);
                 //processFilePayload(payloadId);
             } else if (payload.getType() == Payload.Type.FILE) {
+
+
                 // Add this to our tracking map, so that we can retrieve the payload later.
                 incomingFilePayloads.put(payload.getId(), payload);
                 FileToSendPath file=new FileToSendPath();
                 file.setName(filePayloadFilenames.get(payload.getId()));
                 mPathsList.add(file);
-                myAdapter.notifyDataSetChanged();
+
                 fileIdPosition.put(payload.getId(),index);
+                if(index==0){
+                    myAdapter=new MyAdapter(mPathsList);
+                    myRecyclerView.setAdapter(myAdapter);
+                }
                 index++;
+                myAdapter.notifyDataSetChanged();
             }
+            fileIdType.put(payload.getId(),payload.getType());
+
         }
 
         /**
@@ -251,6 +275,14 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
                     processFilePayload(payloadId);
                // }
             }
+           else if ((update.getStatus() == PayloadTransferUpdate.Status.IN_PROGRESS) &&  (fileIdType.get(update.getPayloadId())==Payload.Type.FILE) ) {
+                float btrans=update.getBytesTransferred();
+                float btotal=update.getTotalBytes();
+                float factor=btrans/btotal;
+                float progpercentage=factor*100;
+                mPathsList.get( fileIdPosition.get(update.getPayloadId())).setProgress((int)progpercentage);
+                myAdapter.notifyItemChanged(fileIdPosition.get(update.getPayloadId()));
+            }
         }
     }
 
@@ -278,7 +310,7 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
 
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-            myViewHolder.fileName.setText( Uri.parse(mPathsList.get(i).path).getLastPathSegment());
+            myViewHolder.fileName.setText(mPathsList.get(i).name);
             myViewHolder.progressBar.setProgress(mPathsList.get(i).progress);
             if (String.valueOf(mPathsList.get(i).progress).equalsIgnoreCase("100")){
                 myViewHolder.percentageText.setText("Completed!");

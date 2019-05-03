@@ -70,6 +70,13 @@ public class SendActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        mPathsList.clear();
+        UpdateView();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mPathsList.clear();
