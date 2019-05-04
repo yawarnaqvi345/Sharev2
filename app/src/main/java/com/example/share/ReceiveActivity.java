@@ -1,9 +1,11 @@
 package com.example.share;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.DataSetObserver;
 import android.net.Uri;
@@ -21,7 +23,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -90,7 +94,7 @@ public class ReceiveActivity extends AppCompatActivity {
 //        myRecyclerView.setAdapter(myAdapter);
 
 
-        Nearby.getConnectionsClient(this)
+        Nearby.getConnectionsClient(ReceiveActivity.this)
                 .startAdvertising(
                         /* endpointName= */ android.os.Build.MODEL,
                         /* serviceId= */ getPackageName(),
@@ -102,7 +106,9 @@ public class ReceiveActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Nearby.getConnectionsClient(ReceiveActivity.this).stopAdvertising();
         super.onDestroy();
+
     }
 
     @Override
@@ -113,8 +119,8 @@ public class ReceiveActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if(connectedDeviceId!=null)
-        Nearby.getConnectionsClient(this).disconnectFromEndpoint(connectedDeviceId);
-        Nearby.getConnectionsClient(this).stopAdvertising();
+        Nearby.getConnectionsClient(ReceiveActivity.this).disconnectFromEndpoint(connectedDeviceId);
+        Nearby.getConnectionsClient(ReceiveActivity.this).stopAdvertising();
     }
     ConnectionLifecycleCallback mConnectionLifecycleCallback=new ConnectionLifecycleCallback() {
         @Override
@@ -127,15 +133,15 @@ public class ReceiveActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface arg0, int arg1) {
-                                    Nearby.getConnectionsClient(getApplicationContext()).acceptConnection(s, mPayLoadCallback);
-                                    Toast.makeText(ReceiveActivity.this,"You clicked yes button",Toast.LENGTH_LONG).show();
+                                    Nearby.getConnectionsClient(ReceiveActivity.this).acceptConnection(s, mPayLoadCallback);
+                                    //Toast.makeText(ReceiveActivity.this,"You clicked yes button",Toast.LENGTH_LONG).show();
                                 }
                             });
 
             alertDialogBuilder.setNegativeButton("Decline",new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Nearby.getConnectionsClient(getApplicationContext()).rejectConnection(s);
+                    Nearby.getConnectionsClient(ReceiveActivity.this).rejectConnection(s);
                     finish();
                 }
             });
@@ -159,6 +165,7 @@ public class ReceiveActivity extends AppCompatActivity {
                     myRecyclerView.setVisibility(View.VISIBLE);
                     elseLinear.setVisibility(View.GONE);
                     connectedDeviceId=s;
+                    Nearby.getConnectionsClient(ReceiveActivity.this).stopAdvertising();
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                     // The connection was rejected by one or both sides.
@@ -182,6 +189,12 @@ public class ReceiveActivity extends AppCompatActivity {
 
         @Override
         public void onDisconnected(String s) {
+            Nearby.getConnectionsClient(ReceiveActivity.this)
+                    .startAdvertising(
+                            /* endpointName= */ android.os.Build.MODEL,
+                            /* serviceId= */ getPackageName(),
+                            mConnectionLifecycleCallback,
+                            new AdvertisingOptions(Strategy.P2P_POINT_TO_POINT));
         }
     };
 //    PayloadCallback mPayLoadCallback= new PayloadCallback() {
@@ -205,6 +218,7 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
         private final SimpleArrayMap<Long, String> filePayloadFilenames = new SimpleArrayMap<>();
         private final SimpleArrayMap<Long, Integer> fileIdPosition = new SimpleArrayMap<>();
         private final SimpleArrayMap<Long, Integer> fileIdType = new SimpleArrayMap<>();
+        private final SimpleArrayMap<Long, String> recfileIdType = new SimpleArrayMap<>();
         int index=0;
 
 
@@ -223,7 +237,6 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
                 FileToSendPath file=new FileToSendPath();
                 file.setName(filePayloadFilenames.get(payload.getId()));
                 mPathsList.add(file);
-
                 fileIdPosition.put(payload.getId(),index);
                 if(index==0){
                     myAdapter=new MyAdapter(mPathsList);
@@ -245,7 +258,11 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
             long payloadId = Long.parseLong(parts[0]);
 
             String filename = parts[1];
+            String type=parts[2];
+            recfileIdType.put(payloadId,type);
             filePayloadFilenames.put(payloadId, filename);
+            recfileIdType.put(payloadId,type);
+           // mPathsList.get(fileIdPosition.get(payloadId)).setType(type);
             return payloadId;
         }
 
@@ -262,6 +279,8 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
                 File payloadFile = filePayload.asFile().asJavaFile();
                 // Rename the file.
                 payloadFile.renameTo(new File(payloadFile.getParentFile(), filename));
+                mPathsList.get( fileIdPosition.get(payloadId)).setPath((new File(payloadFile.getParentFile(), filename).getPath()));
+                mPathsList.get(fileIdPosition.get(payloadId)).setType(recfileIdType.get(payloadId));
             }
         }
 
@@ -303,17 +322,46 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
         @Override
         public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
-            View recyclerFile = layoutInflater.inflate(R.layout.filetoshare_recycler, viewGroup, false);
+            View recyclerFile = layoutInflater.inflate(R.layout.receive_recycler_layout, viewGroup, false);
             MyViewHolder viewHolder = new MyViewHolder(recyclerFile);
             return viewHolder;
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
+        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, final int i) {
             myViewHolder.fileName.setText(mPathsList.get(i).name);
             myViewHolder.progressBar.setProgress(mPathsList.get(i).progress);
             if (String.valueOf(mPathsList.get(i).progress).equalsIgnoreCase("100")){
                 myViewHolder.percentageText.setText("Completed!");
+                myViewHolder.openButton.setVisibility(View.VISIBLE);
+                myViewHolder.openButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String path = mPathsList.get(i).getPath();
+                        Intent in = new Intent(Intent.ACTION_VIEW);
+                        if(mPathsList.get(i).getType().equalsIgnoreCase("Photo")){
+                        in.setDataAndType(Uri.parse(path),"image/*");}
+                        else if(mPathsList.get(i).getType().equalsIgnoreCase("Video")){
+                            in.setDataAndType(Uri.parse(path),"video/*");
+                        }
+                        else if(mPathsList.get(i).getType().equalsIgnoreCase("File")){
+                            MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                           String seg= Uri.parse(path).getLastPathSegment();
+                            String mimeType = myMime.getMimeTypeFromExtension(seg);
+                            in.setDataAndType(Uri.parse(path),mimeType);
+                        }
+                        else if(mPathsList.get(i).getType().equalsIgnoreCase("Music")){
+                            in.setDataAndType(Uri.parse(path),"music/*");
+                        }
+                        //i.setData(Uri.parse(path));
+                        try {
+                            startActivity(in);
+                        } catch (ActivityNotFoundException e) {
+                            Toast.makeText(ReceiveActivity.this, "No handler for this type of file.", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                });
 
             }else{
                 myViewHolder.percentageText.setText(String.valueOf(mPathsList.get(i).progress)+" %");
@@ -330,17 +378,37 @@ PayloadCallback mPayLoadCallback= new ReceiveFilePayloadCallback();
         TextView fileName;
         ProgressBar progressBar;
         TextView percentageText;
+        Button openButton;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            fileName=itemView.findViewById(R.id.finalshare_file_name);
-            progressBar=itemView.findViewById(R.id.finalshare_recycler_progressbar);
-            percentageText=itemView.findViewById(R.id.percentage_text);
+            fileName=itemView.findViewById(R.id.rec_file_name);
+            progressBar=itemView.findViewById(R.id.rec_recycler_progressbar);
+            percentageText=itemView.findViewById(R.id.rec_percentage_text);
+            openButton=itemView.findViewById(R.id.rec_open_button);
+            openButton.setVisibility(View.GONE);
             progressBar.setIndeterminate(false);
             progressBar.setMax(100);
 
         }
     }
+    private String fileExt(String url) {
+        if (url.indexOf("?") > -1) {
+            url = url.substring(0, url.indexOf("?"));
+        }
+        if (url.lastIndexOf(".") == -1) {
+            return null;
+        } else {
+            String ext = url.substring(url.lastIndexOf(".") + 1);
+            if (ext.indexOf("%") > -1) {
+                ext = ext.substring(0, ext.indexOf("%"));
+            }
+            if (ext.indexOf("/") > -1) {
+                ext = ext.substring(0, ext.indexOf("/"));
+            }
+            return ext.toLowerCase();
 
+        }
+    }
 
 
 }

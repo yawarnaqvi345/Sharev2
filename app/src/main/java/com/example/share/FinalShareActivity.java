@@ -73,13 +73,11 @@ public class FinalShareActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         myAdapter=new MyAdapter();
         recyclerView.setAdapter(myAdapter);
-
-
         finalshareTextView=findViewById(R.id.finalshare_activity_text);
+
         EndpointDiscoveryCallback mEndpointDiscoveryCallback = new EndpointDiscoveryCallback() {
             @Override
             public void onEndpointFound(final String s, final DiscoveredEndpointInfo discoveredEndpointInfo) {
-
                 deviceName.put(s,discoveredEndpointInfo.getEndpointName());
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(FinalShareActivity.this);
                 alertDialogBuilder.setMessage("Found a device named "+discoveredEndpointInfo.getEndpointName()+": Do you want to sent to this device?");
@@ -87,7 +85,7 @@ public class FinalShareActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
-                                Nearby.getConnectionsClient(getApplicationContext())
+                                Nearby.getConnectionsClient(FinalShareActivity.this)
                                         .requestConnection(
                                                 /* endpointName= */ discoveredEndpointInfo.getEndpointName(),
                                                 s,
@@ -95,7 +93,7 @@ public class FinalShareActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         Toast.makeText(getApplicationContext(), "on Success connection", Toast.LENGTH_SHORT).show();
-                                        Nearby.getConnectionsClient(mActivity)
+                                        Nearby.getConnectionsClient(FinalShareActivity.this)
                                                 .stopDiscovery();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -153,7 +151,7 @@ public class FinalShareActivity extends AppCompatActivity {
         };
 
 
-        Nearby.getConnectionsClient(this)
+        Nearby.getConnectionsClient(FinalShareActivity.this)
                 .startDiscovery(
                         /* serviceId= */ getPackageName(),
                         mEndpointDiscoveryCallback,
@@ -162,7 +160,7 @@ public class FinalShareActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-
+        Nearby.getConnectionsClient(FinalShareActivity.this).stopDiscovery();
         super.onDestroy();
     }
 
@@ -177,8 +175,8 @@ public class FinalShareActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if(connectedDeviceId!=null)
-            Nearby.getConnectionsClient(this).disconnectFromEndpoint(connectedDeviceId);
-        Nearby.getConnectionsClient(this).stopDiscovery();
+            Nearby.getConnectionsClient(FinalShareActivity.this).disconnectFromEndpoint(connectedDeviceId);
+        Nearby.getConnectionsClient(FinalShareActivity.this).stopDiscovery();
     }
 
     private final ConnectionLifecycleCallback mConnectionLifecycleCallback = new ConnectionLifecycleCallback() {
@@ -207,16 +205,16 @@ public class FinalShareActivity extends AppCompatActivity {
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
-                        String filenameMessage = filePayload.getId() + ":" + uri.getLastPathSegment();
+                        String filenameMessage = filePayload.getId() + ":" + uri.getLastPathSegment()+":"+path.getType();
                         Payload filenameBytesPayload =
                                 Payload.fromBytes(filenameMessage.getBytes(StandardCharsets.UTF_8));
-                        Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filenameBytesPayload);
+                        Nearby.getConnectionsClient(FinalShareActivity.this).sendPayload(s, filenameBytesPayload);
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Nearby.getConnectionsClient(getApplicationContext()).sendPayload(s, filePayload);
+                        Nearby.getConnectionsClient(FinalShareActivity.this).sendPayload(s, filePayload);
                         recyclerIdPosition.put(filePayload.getId(),index);
                         index++;
                     }

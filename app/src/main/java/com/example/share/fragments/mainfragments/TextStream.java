@@ -65,11 +65,11 @@ public class TextStream extends Fragment {
         Nearby.getConnectionsClient(getContext())
                 .startAdvertising(
                         /* endpointName= */ android.os.Build.MODEL,
-                        /* serviceId= */ this.getActivity().getPackageName(),
+                        /* serviceId= */ getContext().getPackageName(),
                         mConnectionLifecycleCallback,
                         new AdvertisingOptions(Strategy.P2P_CLUSTER));
         Nearby.getConnectionsClient(getContext())
-                .startDiscovery(this.getActivity().getPackageName(),endpointDiscoveryCallback,
+                .startDiscovery(getContext().getPackageName(),endpointDiscoveryCallback,
                         new DiscoveryOptions(Strategy.P2P_CLUSTER));
     }
 
@@ -100,7 +100,9 @@ public class TextStream extends Fragment {
                     textRecycler.setAdapter(myAdapter);
                     textRecycler.setVisibility(View.VISIBLE);
                     //myAdapter.notifyDataSetChanged();
-                index++;}else {myAdapter.notifyDataSetChanged();}
+                index++;}else {
+                    myAdapter.notifyDataSetChanged();
+                    textRecycler.scrollToPosition(textList.size()-1);}
 
                 Payload filenameBytesPayload =
                         Payload.fromBytes(messa.getBytes(StandardCharsets.UTF_8));
@@ -150,13 +152,13 @@ public class TextStream extends Fragment {
                    // Toast.makeText(getApplicationContext(), "Connection Accepted", Toast.LENGTH_SHORT).show();
                    devName.setText("Connected to "+s);
                    id=s;
+                    Nearby.getConnectionsClient(getContext()).stopDiscovery();
+                    Nearby.getConnectionsClient(getContext()).stopAdvertising();
                    connectButton.setVisibility(View.GONE);
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
-
                     break;
                 case ConnectionsStatusCodes.STATUS_ERROR:
-                  ;
                     break;
                 default:
                     break;
@@ -208,6 +210,7 @@ else{
     message.setSender("other");
     textList.add(message);
     myAdapter.notifyDataSetChanged();
+    textRecycler.scrollToPosition(textList.size()-1);
 }
         }
 
@@ -249,6 +252,7 @@ else{
            View recyclerFile = layoutInflater.inflate(R.layout.text_recycler_layout, viewGroup, false);
            // RecyclerView.ViewHolder viewHolder = new RecyclerView.ViewHolder(listItem);
            MyViewHolder viewHolder = new MyViewHolder(recyclerFile);
+           viewHolder.setIsRecyclable(false);
            return viewHolder;
        }
 
