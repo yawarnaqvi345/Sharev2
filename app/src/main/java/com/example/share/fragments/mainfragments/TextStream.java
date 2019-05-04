@@ -10,6 +10,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.PrecomputedText;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +18,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.share.R;
 import com.example.share.models.TextMessage;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -87,6 +90,7 @@ public class TextStream extends Fragment {
             public void onClick(View v) {
                // Editable str=messageTextView.getText();
                 String messa = String.valueOf(messageTextView.getText());
+                messageTextView.setText("");
                 TextMessage tex=new TextMessage();
                 tex.setSender("me");
                 tex.setText(messa);
@@ -95,8 +99,9 @@ public class TextStream extends Fragment {
                     myAdapter=new MyRecyclerAdapter(textList);
                     textRecycler.setAdapter(myAdapter);
                     textRecycler.setVisibility(View.VISIBLE);
-                index++;}
-                myAdapter.notifyDataSetChanged();
+                    //myAdapter.notifyDataSetChanged();
+                index++;}else {myAdapter.notifyDataSetChanged();}
+
                 Payload filenameBytesPayload =
                         Payload.fromBytes(messa.getBytes(StandardCharsets.UTF_8));
 
@@ -194,13 +199,16 @@ if(index==0){
     myAdapter=new MyRecyclerAdapter(textList);
     textRecycler.setAdapter(myAdapter);
     textRecycler.setVisibility(View.VISIBLE);
+    index++;
 }
-else{TextMessage message=new TextMessage();
+else{
+    TextMessage message=new TextMessage();
     String mess = new String(payload.asBytes(), StandardCharsets.UTF_8);
-    textList.get(index).setText(mess);
+    message.setText(mess);
+    message.setSender("other");
     textList.add(message);
-}
     myAdapter.notifyDataSetChanged();
+}
         }
 
         @Override
@@ -246,11 +254,19 @@ else{TextMessage message=new TextMessage();
 
        @Override
        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-           myViewHolder.messageText.setText(mText.get(i).getText());
 
-           if(mText.get(i).getSender().equalsIgnoreCase("other"))
-           { myViewHolder.messageText.setGravity(Gravity.LEFT);
-           myViewHolder.txtCardView.setCardBackgroundColor(Color.rgb(10,240,50));}
+           myViewHolder.messageText.setText(mText.get(i).getText());
+           if(mText.get(i).getSender().equalsIgnoreCase("other")){
+               RelativeLayout.LayoutParams param= (RelativeLayout.LayoutParams) myViewHolder.txtCardView.getLayoutParams();
+               param.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+               myViewHolder.txtCardView.setLayoutParams(param);
+               myViewHolder.txtCardView.setCardBackgroundColor(Color.rgb(10,240,50));
+           }else {
+              // myViewHolder.txtCardView.setCardBackgroundColor(Color.rgb(10,240,50));
+               RelativeLayout.LayoutParams param= (RelativeLayout.LayoutParams) myViewHolder.txtCardView.getLayoutParams();
+               param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+               myViewHolder.txtCardView.setLayoutParams(param);
+           }
 
        }
 
@@ -264,8 +280,8 @@ else{TextMessage message=new TextMessage();
         CardView txtCardView;
        public MyViewHolder(@NonNull View itemView) {
            super(itemView);
-           messageText=itemView.findViewById(R.id.message_text);
-           txtCardView=itemView.findViewById(R.id.text_rec_cardview);
+           messageText=(TextView) itemView.findViewById(R.id.message_text);
+           txtCardView=(CardView) itemView.findViewById(R.id.text_rec_cardview);
        }
    }
 }

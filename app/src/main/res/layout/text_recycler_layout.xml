@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,19 +7,23 @@
     android:layout_marginTop="5dp">
     <android.support.v7.widget.CardView
         android:id="@+id/text_rec_cardview"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
-        android:padding="5dp"
+        android:padding="10dp"
         app:cardBackgroundColor="@color/colorPrimary">
     <TextView
         android:gravity="right"
-        android:layout_margin="5dp"
+        android:singleLine="false"
+        android:inputType="textMultiLine"
+        android:maxEms="5"
+        android:textSize="20dp"
+        android:layout_margin="10dp"
         android:layout_marginRight="10dp"
         android:id="@+id/message_text"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="abc"/>
     </android.support.v7.widget.CardView>
 
-</LinearLayout>
+</RelativeLayout>

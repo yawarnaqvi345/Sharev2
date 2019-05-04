@@ -62,14 +62,17 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/text_recycler"
+        android:layout_below="@id/dev_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"></android.support.v7.widget.RecyclerView>
+        android:layout_above="@+id/write_message_layout"
+        android:visibility="gone" />
     <LinearLayout
         android:id="@+id/write_message_layout"
+
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="50dp">
         <EditText
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
