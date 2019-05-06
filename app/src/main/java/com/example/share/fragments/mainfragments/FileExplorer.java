@@ -169,7 +169,7 @@ public class FileExplorer extends Fragment {
             {
                 m_viewHolder.m_cbCheck.setVisibility(View.INVISIBLE);
             }
-
+            m_viewHolder.m_cbCheck.setVisibility(View.INVISIBLE);
             m_viewHolder.m_tvFileName.setText(m_item.get(p_position));
             m_viewHolder.m_ivIcon.setImageResource(setFileImageType(new File(m_path.get(p_position))));
             m_viewHolder.m_tvDate.setText(getLastDate(p_position));

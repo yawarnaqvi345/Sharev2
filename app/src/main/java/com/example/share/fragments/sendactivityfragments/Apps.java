@@ -142,9 +142,12 @@ AsyncTask asy;
     }
     private ArrayList<AppIication> getInstalledApps(boolean getSysPackages) {
         ArrayList<AppIication> appsList = new ArrayList<AppIication>();
+        List<ApplicationInfo> apps = getContext().getPackageManager().getInstalledApplications(0);
         List<PackageInfo> packs = getContext().getPackageManager().getInstalledPackages(0);
         for(int i=0;i<packs.size();i++) {
+
             PackageInfo p = packs.get(i);
+
             ApplicationInfo a=p.applicationInfo;
             File apk = new File(a.publicSourceDir);
            // File apk = getApkFile(getContext(),p.packageName);

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.share.R;
 import com.example.share.models.TextMessage;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
@@ -52,6 +54,15 @@ public class TextStream extends Fragment {
     EditText messageTextView;
     Button sendButton;
     String id;
+    LottieAnimationView searchAnim;
+    RecyclerView devFoundRecycler;
+    LinearLayout searchLayout;
+    Button discoverButton;
+    boolean isDiscoverer=false;
+    LinearLayout writeMessageLayout;
+    MyDevRecyclerAdapter devAdapter;
+    List<String> discoveredDevices=new ArrayList<String>();
+    private final SimpleArrayMap<String, String> devNametoPos = new SimpleArrayMap<>();
     public TextStream() {
         // Required empty public constructor
     }
@@ -68,9 +79,9 @@ public class TextStream extends Fragment {
                         /* serviceId= */ getContext().getPackageName(),
                         mConnectionLifecycleCallback,
                         new AdvertisingOptions(Strategy.P2P_CLUSTER));
-        Nearby.getConnectionsClient(getContext())
-                .startDiscovery(getContext().getPackageName(),endpointDiscoveryCallback,
-                        new DiscoveryOptions(Strategy.P2P_CLUSTER));
+//        Nearby.getConnectionsClient(getContext())
+//                .startDiscovery(getContext().getPackageName(),endpointDiscoveryCallback,
+//                        new DiscoveryOptions(Strategy.P2P_CLUSTER));
     }
 
     @Override
@@ -85,6 +96,7 @@ public class TextStream extends Fragment {
         textRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         messageTextView=(EditText) rootView.findViewById(R.id.message_text);
         sendButton=rootView.findViewById(R.id.send_message_button);
+        writeMessageLayout=rootView.findViewById(R.id.write_message_layout);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +124,25 @@ public class TextStream extends Fragment {
                 //Nearby.getConnectionsClient(getContext()).sendPayload()
             }
         });
+
+
+        searchLayout=rootView.findViewById(R.id.search_layout);
+        devFoundRecycler=rootView.findViewById(R.id.dev_found_recycler);
+        devFoundRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchAnim=rootView.findViewById(R.id.search_animation);
+        discoverButton=rootView.findViewById(R.id.mbutton_discover);
+        discoverButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Nearby.getConnectionsClient(getContext())
+                .startDiscovery(getContext().getPackageName(),endpointDiscoveryCallback,
+                        new DiscoveryOptions(Strategy.P2P_CLUSTER));
+                discoverButton.setVisibility(View.GONE);
+                searchAnim.setVisibility(View.VISIBLE);
+                isDiscoverer=true;
+
+            }
+        });
        // textRecycler.setAdapter(new MyRecyclerAdapter());
         return rootView;
 
@@ -122,6 +153,7 @@ public class TextStream extends Fragment {
     ConnectionLifecycleCallback mConnectionLifecycleCallback=new ConnectionLifecycleCallback() {
         @Override
         public void onConnectionInitiated(@NonNull final String s, @NonNull ConnectionInfo connectionInfo) {
+            if(!isDiscoverer){
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
             alertDialogBuilder.setMessage(s+" wants to connect with this device");
             alertDialogBuilder.setPositiveButton("Allow",
@@ -143,6 +175,7 @@ public class TextStream extends Fragment {
 
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
+        }else{ Nearby.getConnectionsClient(getContext()).acceptConnection(s, mPayLoadCallback);}
         }
 
         @Override
@@ -152,8 +185,14 @@ public class TextStream extends Fragment {
                    // Toast.makeText(getApplicationContext(), "Connection Accepted", Toast.LENGTH_SHORT).show();
                    devName.setText("Connected to "+s);
                    id=s;
+                   discoverButton.setVisibility(View.GONE);
+                   searchLayout.setVisibility(View.GONE);
+                   devInfo.setVisibility(View.VISIBLE);
                     Nearby.getConnectionsClient(getContext()).stopDiscovery();
-                    Nearby.getConnectionsClient(getContext()).stopAdvertising();
+                    textRecycler.setVisibility(View.VISIBLE);
+                    writeMessageLayout.setVisibility(View.VISIBLE);
+
+                   // Nearby.getConnectionsClient(getContext()).stopAdvertising();
                    connectButton.setVisibility(View.GONE);
                     break;
                 case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
@@ -171,16 +210,28 @@ public class TextStream extends Fragment {
 
         }
     };
+   int fDevIndex=0;
     EndpointDiscoveryCallback endpointDiscoveryCallback=new EndpointDiscoveryCallback() {
         @Override
         public void onEndpointFound(@NonNull final String s, @NonNull final DiscoveredEndpointInfo discoveredEndpointInfo) {
+           searchAnim.setVisibility(View.GONE);
+           searchLayout.setVisibility(View.VISIBLE);
+           discoveredDevices.add(discoveredEndpointInfo.getEndpointName());
+           if(fDevIndex==0){
+               devAdapter=new MyDevRecyclerAdapter();
+               devFoundRecycler.setAdapter(devAdapter);
+           }else{
+                   devAdapter.notifyDataSetChanged();
+        }
+           devNametoPos.put(discoveredEndpointInfo.getEndpointName(),s);
             devName.setText(discoveredEndpointInfo.getEndpointName());
-            connectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Nearby.getConnectionsClient(getContext()).requestConnection(discoveredEndpointInfo.getEndpointName(),s,mConnectionLifecycleCallback);
-                }
-            });
+
+//            connectButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Nearby.getConnectionsClient(getContext()).requestConnection(discoveredEndpointInfo.getEndpointName(),s,mConnectionLifecycleCallback);
+//                }
+//            });
         }
 
         @Override
@@ -288,4 +339,46 @@ else{
            txtCardView=(CardView) itemView.findViewById(R.id.text_rec_cardview);
        }
    }
+
+
+
+
+
+    class MyDevRecyclerAdapter extends RecyclerView.Adapter<MyDevViewHolder>{
+        @NonNull
+        @Override
+        public MyDevViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
+            View recyclerFile = layoutInflater.inflate(R.layout.rec_devices_layout, viewGroup, false);
+            MyDevViewHolder viewHolder = new MyDevViewHolder(recyclerFile);
+            viewHolder.setIsRecyclable(false);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MyDevViewHolder myDevViewHolder, final int i) {
+myDevViewHolder.devName.setText(discoveredDevices.get(i));
+myDevViewHolder.conButton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Nearby.getConnectionsClient(getContext()).requestConnection(discoveredDevices.get(i),devNametoPos.get(discoveredDevices.get(i)),mConnectionLifecycleCallback);
+    }
+});
+        }
+
+        @Override
+        public int getItemCount() {
+            return discoveredDevices.size();
+        }
+    }
+
+    class MyDevViewHolder extends  RecyclerView.ViewHolder{
+        TextView devName;
+        Button conButton;
+        public MyDevViewHolder(@NonNull View itemView) {
+            super(itemView);
+            devName=itemView.findViewById(R.id.rec_dev_name);
+            conButton=itemView.findViewById(R.id.rec_connect_button);
+        }
+    }
 }

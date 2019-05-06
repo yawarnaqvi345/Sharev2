@@ -3,47 +3,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.mainfragments.TextStream">
 
     <!-- TODO: Update blank fragment layout -->
-    <LinearLayout
-        android:id="@+id/upper_linear"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-       android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:padding="8dp"
-        android:layout_height="wrap_content">
     <Button
-        android:id="@+id/button_broadcast"
+        android:id="@+id/mbutton_discover"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
-        android:layout_weight="1"
-        android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:background="@drawable/roundedbutton"
-        android:text="BroadCast" />
-    <Button
-        android:layout_toRightOf="@+id/button_broadcast"
-        android:id="@+id/button_Discover"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
+        android:padding="20dp"
+        android:layout_centerInParent="true"
         android:layout_weight="1"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         android:background="@drawable/roundedbutton"
         android:text="Discover" />
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_marginLeft="10dp"
+        android:id="@+id/search_animation"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        app:lottie_rawRes="@raw/ripples"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/search_layout"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="searching"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/dev_found_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:id="@+id/dev_info"
+android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_below="@+id/upper_linear"
         android:layout_height="wrap_content">
         <TextView
+            android:background="#CCCCC6"
             android:id="@+id/dev_name"
+            android:textSize="20dp"
+            android:padding="20dp"
+            android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -51,6 +65,7 @@
         <Button
             android:layout_toRightOf="@+id/button_broadcast"
             android:id="@+id/connect_button"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
@@ -69,10 +84,12 @@
         android:visibility="gone" />
     <LinearLayout
         android:id="@+id/write_message_layout"
-
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+android:visibility="gone"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content">
         <EditText
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
@@ -81,10 +98,12 @@
         <Button
             android:layout_gravity="center"
             android:gravity="center"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/ic_send_black_24dp"
             android:id="@+id/send_message_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send"/>
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+           />
     </LinearLayout>
 
 </RelativeLayout>

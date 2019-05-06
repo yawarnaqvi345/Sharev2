@@ -258,7 +258,7 @@ public class FinalShareActivity extends AppCompatActivity {
 
         @Override
         public void onPayloadTransferUpdate(String s, PayloadTransferUpdate payloadTransferUpdate) {
-            Toast.makeText(getApplicationContext(),"Payload Updated",Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getApplicationContext(),"Payload Updated",Toast.LENGTH_SHORT).show();
             if (payloadTransferUpdate.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                 long payloadId = payloadTransferUpdate.getPayloadId();
               //  int pos=recyclerIdPosition.get(payloadId);
